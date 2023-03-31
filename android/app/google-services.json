@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "907065241170",
+    "firebase_url": "https://ichatindia-default-rtdb.firebaseio.com",
+    "project_id": "ichatindia",
+    "storage_bucket": "ichatindia.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907065241170:android:6556f1ef5e8c247b76b98b",
+        "android_client_info": {
+          "package_name": "com.ichatindia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "907065241170-91uregces4ujmgu5361h80n7928droof.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ichatindia",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "907065241170-kv16b5lfq73166ce229e869pmfid763f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCddYuNH_PhAcU1hkrUpZIrxZdYpujCmMU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "907065241170-kv16b5lfq73166ce229e869pmfid763f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907065241170:android:f92b9b70913c693876b98b",
+        "android_client_info": {
+          "package_name": "com.newdemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "907065241170-kv16b5lfq73166ce229e869pmfid763f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCddYuNH_PhAcU1hkrUpZIrxZdYpujCmMU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "907065241170-kv16b5lfq73166ce229e869pmfid763f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
