@@ -25,8 +25,8 @@ export default function Message(props) {
                 </View>
                 <View style={styles.messageSentFooter}>
                     <Text style={{...styles.messageTime, color: colors.textSecondary }}>{ `${ messageData.sentAt && messageData.sentAt.toDate().toString().split(' ')[4].toString().substring(0,5) }` }</Text>
-                    { !props.received && props.seen ? 
-                        <Ionicons name={'ios-checkmark-done'} size={ 13 } style={{ color: colors.textSecondary, padding: 3 }} />
+                    { !props.received && messageData.isSent ? 
+                        ( props.seen ? <Ionicons name={'ios-checkmark-done'} size={ 13 } style={{ color: colors.blue, padding: 3 }} /> : <Ionicons name={'ios-checkmark-done'} size={ 13 } style={{ color: colors.textSecondary, padding: 3 }} />)
                         : <Ionicons name={'ios-checkmark'} size={ 13 } style={{ color: colors.textSecondary, padding: 3 }} />
                     }
                 </View>

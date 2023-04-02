@@ -7,6 +7,7 @@ import MIcons from 'react-native-vector-icons/MaterialIcons'
 import ShowDPModal from './../Home/Components/ShowDP'
 import uuid from 'react-native-uuid'
 import { StackActions } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 
 const ContactItem = (props) => {
@@ -89,12 +90,12 @@ export default function ContactScreen({ route, navigation }) {
 
     const createGroupReq = route.params.createGroupReq
     const colors = route.params.colors
-    
-    const [contactList, setContactList] = useState()
+
     const [ichatUserContactList, setIchatUserContactList] = useState()
     const [selectedContact, setSelectedContact] = useState()
     const [showDPURL, setShowDPURL] = useState(null)
     const [showCreateGroupButton, setShowCreateGroupButton] = useState(false)
+    const mobileContacts = useSelector((state) => state.mobileContacts.contacts)
 
     useEffect(() => {
         console.log(selectedContact)
@@ -149,43 +150,14 @@ export default function ContactScreen({ route, navigation }) {
     }
 
     useEffect(() => {
-        async function getContacts() {
-            try {
-                const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                  const contacts = await Contacts.getAll()
-                  const _ = []
-                  contacts.forEach(contact => {
-                    if(contact.phoneNumbers[0]){
-                        const pn = contact.phoneNumbers[0].number.startsWith("+91") ? contact.phoneNumbers[0].number : "+91" + contact.phoneNumbers[0].number 
-                        const contact_ = {
-                            fullname: contact.displayName,
-                            phonenumber: pn
-                        }
-                        _.push(contact_)
-                    }
-                  })
-                  setContactList(_)
-                } else {
-                  console.log('Contact permission denied');
-                }
-              } catch (err) {
-                console.log(err);
-              }
-        }
-        getContacts()
-    }, [])
-
-    useEffect(() => {
-        if(contactList){
+        if(mobileContacts){
             const _ = []
             async function getIchatUserContacts(){
-                for await (const contact of contactList){
-                    if(contact.phonenumber == '+916367267062' || contact.phonenumber == '+919649162358') console.log(contact)
-                    const user = await firestore().collection("Users").doc(contact.phonenumber).get()
+                for await (const contact of Object.keys(mobileContacts)){
+                    const user = await firestore().collection("Users").doc(mobileContacts[contact].phonenumber).get()
                     if(user.exists){
                         const userData = user.data()
-                        const cont = { uuid: uuid.v4(), fullname: contact.fullname, phonenumber: contact.phonenumber, about: userData.about, profilePicture: userData.profilePicture}
+                        const cont = { uuid: uuid.v4(), fullname: mobileContacts[contact].fullname, phonenumber: mobileContacts[contact].phonenumber, about: userData.about, profilePicture: userData.profilePicture}
                         _.push(cont)
                     }
                 }
@@ -193,7 +165,7 @@ export default function ContactScreen({ route, navigation }) {
             }
             getIchatUserContacts().then(data => setIchatUserContactList(data))
         }
-    }, [contactList])
+    }, [])
 
     useEffect(() => {
         console.log('iChatUserContactList', ichatUserContactList)

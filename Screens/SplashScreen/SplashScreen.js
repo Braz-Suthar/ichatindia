@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Appearance, StatusBar, Animated, Easing } from "react-native"
+import { View, StyleSheet, Appearance, StatusBar, Animated, Easing, PermissionsAndroid } from "react-native"
 import Colors from '../../Colors'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore'
 import { login, logout } from './../../src/StateManagement/Slices/CurrentUserSlice'
 import { useDispatch } from 'react-redux'
+import Contacts, { getContactsByEmailAddress } from 'react-native-contacts';
+import { set } from './../../src/StateManagement/Slices/MobileContactsSlice'
 
 export default function SplashScreen() {
 
@@ -18,31 +20,77 @@ export default function SplashScreen() {
         return () => subscription.remove()
     }, [])
 
-    useEffect(() => {
-        
-        const getData = async () => {
-            try {
-                const value = await AsyncStorage.getItem('user')
-                if(value !== null) {
-                    // value previously stored
-                    const ref = firestore().collection("Users").doc('+91' + value)
-                    const result = await ref.get()
-                    if(result.exists){
-                        const userData = result.data()
-                        dispatch(login(userData))
-                    }else{
-                        dispatch(logout('noUserLoggedIn'))
+    const getStoredContacts = async () => {
+        try {
+            const contacts = await AsyncStorage.getItem('mobileContacts') 
+            if(contacts == null) return {}
+            return JSON.parse(contacts)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const getMobileContacts = async () => {
+        const contactsCount = await Contacts.getCount()
+        let mobileContacts = await getStoredContacts()
+        let mobileContactsCount = await AsyncStorage.getItem("mobileContactsCount")
+        mobileContactsCount = mobileContactsCount == null ? 0 : mobileContactsCount
+        if(mobileContactsCount == 0 || contactsCount != mobileContactsCount){
+            const contacts = await Contacts.getAll()
+            contacts.forEach(contact => {
+                if(contact.phoneNumbers[0]){
+                    const number = contact.phoneNumbers[0].number.toString().replaceAll(' ', '')
+                    const pn = number.startsWith("+91") ? number : "+91" + number 
+                    let pn_ = pn.replaceAll(' ', '')
+                    mobileContacts[pn_] = {
+                        fullname: contact.displayName,
+                        phonenumber: pn_
                     }
-                }else{
-                    dispatch(logout('noUserLoggedIn'))
                 }
-            } catch(e) {
+            })
+            await AsyncStorage.setItem("mobileContacts", JSON.stringify(mobileContacts))
+            await AsyncStorage.setItem("mobileContactsCount", '' + contactsCount)
+        } 
+        dispatch(set(mobileContacts))
+        checkLoginStatus()
+    }
+
+    const requestContactsReadPermission = async () => {
+        const isGranted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
+        if (isGranted === PermissionsAndroid.RESULTS.GRANTED) {
+            getMobileContacts()
+        }else{
+            const mobileContacts = await getStoredContacts()
+            mobileContacts && dispatch(set(mobileContacts))
+            checkLoginStatus()
+        }
+    }
+
+    const checkLoginStatus = async () => {
+        const value = await AsyncStorage.getItem('user')
+        if(value !== null) {
+            const ref = firestore().collection("Users").doc('+91' + value)
+            const result = await ref.get()
+            if(result.exists){
+                const userData = result.data()
+                dispatch(login(userData))
+            }else{
                 dispatch(logout('noUserLoggedIn'))
             }
+        }else{
+            dispatch(logout('noUserLoggedIn'))
         }
-        getData()
+    }
 
-    }, [])
+    const checkContactsReadPermission = async () => {
+        const isContactsReadPermissionGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
+        if(isContactsReadPermissionGranted){
+            getMobileContacts()
+        }else{
+            requestContactsReadPermission()
+        }
+    }
+    
 
     const colors = Colors[themeState] 
 
@@ -54,7 +102,9 @@ export default function SplashScreen() {
             duration: 500,
             easing: Easing.ease,
             useNativeDriver: true,
-        }).start()
+        }).start(({ finished }) => {
+            if(finished) checkContactsReadPermission()
+        })
     }, [])
      
     return(

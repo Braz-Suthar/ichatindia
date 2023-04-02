@@ -8,7 +8,6 @@ import About from '../Home/Components/About.js'
 import ProfilePicture from '../Home/Components/ProfilePicture.js';
 import Message from './Components/Message.js';
 import firestore from '@react-native-firebase/firestore'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid'
 import sendNotification from './sendNotification.js';
 import { useSelector } from 'react-redux';
@@ -28,31 +27,20 @@ export default function ChatScreen({ route, navigation }) {
 
   const colors = Colors[themeState] 
 
-  const phonenumber = route.params.userData.phonenumber
-  const [loggedInUser, setLoggedInUser] = useState()
-  const [userData, setUserData] = useState()
-  const [messageData, setMessageData] = useState({})
-  const [text, setText] = useState()
-  const [inputRef, setInputRef] = useState()
+  const phonenumber = route.params.userData.phonenumber // reciever phone number
+  const [userData, setUserData] = useState()  // reciever user data
+  const [messageData, setMessageData] = useState({})  // all messages
+  const [text, setText] = useState() // message
+  const [inputRef, setInputRef] = useState()  // text input reference
+  const [readMessages, setReadMessages] = useState([])
   
-
-  useEffect(() => {
-    const setUser = async () => {
-      try {
-        const value = await AsyncStorage.getItem('user')
-        if(value !== null) setLoggedInUser(value)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    setUser()
-  }, [])
   
   useEffect(() => {
     const getData = async () => {
+      console.log(phonenumber)
       try {
         let data = {}
-        const chatRef = firestore().collection('Users').doc("+91" + loggedInUser).collection('chats').doc(phonenumber)
+        const chatRef = firestore().collection('Users').doc(currentUser.phonenumber).collection('chats').doc(phonenumber)
         const chatCollection = await chatRef.get()
         if(chatCollection.exists){
           let userData_ = chatCollection.data()
@@ -66,40 +54,68 @@ export default function ChatScreen({ route, navigation }) {
         console.log(error)
       }
     }
-    if(loggedInUser) getData()
-  }, [loggedInUser])
+    getData()
+  }, [])
 
 
   useEffect(() => {
     let subscriber
     let subscriber_
+    
+    if(userData){
+      
+      const onResult = async (QuerySnapshot) => {
+        console.log(QuerySnapshot.data().ReadTextIDs.length)
+        setReadMessages(QuerySnapshot.data().ReadTextIDs)
+      }
+
+      const onError = (error) => {
+        console.log(error)
+      }
+      subscriber_ = firestore().collection("Chats").doc(userData.chatID).collection(userData.phonenumber).doc('ReadMessages').onSnapshot(onResult, onError)
+    }
+
     if(userData){
       let c = null
       const onResult = async (QuerySnapshot) => {
         let d = {}
-        const changes = QuerySnapshot.docChanges()
-        // console.log("changes -->", changes)
-        if(c == null){
-          c = [ ...changes ]
-          // console.log("if")
-          c.forEach(change => {
-            // console.log("change.doc.data()")
-            const d_ = change.doc.data()
-            d = { ...d, [d_.textID]: d_ }
-          })
-          // console.log(d)
-          setMessageData({ ...d, ...messageData })
-          d = {}
-        }else if(changes.length) {
-          // console.log("else")
-          changes.forEach(change => {
-            // console.log(change.doc.data())
-            const d_ = change.doc.data()
-            d = { ...d, [d_.textID]: d_ }
-          })
-          setMessageData({ ...d, ...messageData })
-          d = {}
-        }
+        const readTextIDs = []
+        QuerySnapshot.forEach(snapshot => {
+          // console.log(snapshot.data())
+          const data = snapshot.data()
+          if(data.receiver == currentUser.phonenumber)
+            readTextIDs.push(data.textID)
+          const _ = { ...data }
+          d[data.textID] = _
+        })
+
+        setMessageData({ ...d })
+        d = {}
+        await firestore().collection("Chats").doc(userData.chatID).collection(currentUser.phonenumber).doc('ReadMessages').set({
+          ReadTextIDs: [ ...readTextIDs ]
+        })
+        
+        // if(c == null){
+        //   c = [ ...changes ]
+        //   // console.log("if")
+        //   c.forEach(change => {
+        //     // console.log("change.doc.data()")
+        //     const d_ = change.doc.data()
+        //     d = { ...d, [d_.textID]: d_ }
+        //   })
+        //   // console.log(d)
+        //   setMessageData({ ...d, ...messageData })
+        //   d = {}
+        // }else if(changes.length) {
+        //   // console.log("else")
+        //   changes.forEach(change => {
+        //     // console.log(change.doc.data())
+        //     const d_ = change.doc.data()
+        //     d = { ...d, [d_.textID]: d_ }
+        //   })
+        //   setMessageData({ ...d, ...messageData })
+        //   d = {}
+        // }
         // console.log(c)
         // changes.forEach(change => {
         //   // console.log("----->", change.doc)
@@ -118,50 +134,9 @@ export default function ChatScreen({ route, navigation }) {
       subscriber = firestore().collection("Chats").doc(userData.chatID).collection('_').orderBy('sentAt', 'desc').onSnapshot({ includeMetadataChanges: true }, onResult, onError)
     }
 
-    if(userData){
-      let c = null
-      const onResult = async (QuerySnapshot) => {
-        // console.log('-----> ', QuerySnapshot)
-        const changes = QuerySnapshot.docChanges()
-        // console.log("changes -->", changes)
-        if(c == null){
-          c = [ ...changes ]
-          // console.log("if")
-          c.forEach(change => {
-            // console.log(change.doc.data())
-            firestore().collection("Chats").doc(userData.chatID).collection('_').doc(change.doc.data().textID).update({
-              'isRead': true
-            }).then(res => {
-              console.log(res)
-            }).catch(err => {
-              console.log(err)
-            })
-            // const d_ = change.doc.data()
-            // d = { ...d, [d_.textID]: d_ }
-          })
-          // console.log(d)
-          // setMessageData({ ...d, ...messageData })
-          // d = {}
-        }
-      }
-
-      const onError = (error) => {
-        console.log(error)
-      }
-      console.log(userData.phonenumber)
-      subscriber_ = firestore().collection("Chats").doc(userData.chatID).collection('_').where("isRead", '==', false).where('sender', '==', userData.phonenumber).onSnapshot({ includeMetadataChanges: true }, onResult, onError)
-    }
-
     if(subscriber) return () => subscriber()
     if(subscriber_) return () => subscriber_()
   }, [userData])
-
-
-  // useEffect(() => {
-  //   if(messageData && Object.keys(messageData).length == 0){
-  //     setMessageData([])
-  //   }
-  // }, [messageData])
 
   const sendMessage = async () => {
     if(!messageData || messageData){
@@ -170,7 +145,7 @@ export default function ChatScreen({ route, navigation }) {
       inputRef.clear()
       const textID = uuid.v4()
       const timeStamp = firestore.FieldValue.serverTimestamp()
-      
+      // text data
       const data = {
         textID: textID,
         isDeleted: false,
@@ -182,30 +157,34 @@ export default function ChatScreen({ route, navigation }) {
         receivedAt: null,
         receiver: phonenumber,
         replyTextID: null,
-        sender: loggedInUser,
+        sender: currentUser.phonenumber,
         sentAt: timeStamp,
         text: text_.toString()
       }
       
-      const ref_ = firestore().collection("Users").doc("+91" + loggedInUser).collection("chats").doc(phonenumber)
+      const ref_ = firestore().collection("Users").doc(currentUser.phonenumber).collection("chats").doc(phonenumber)
       const result = await ref_.get()
       if(result.exists){
+        // chat already exists
         chatID = result.data().chatID
         const ref =  firestore().collection("Chats").doc(chatID).collection('_').doc(textID)
         await ref.set(data)
-        await firestore().collection("Users").doc("+91" + loggedInUser).collection("chats").doc(phonenumber).update({ 
+        await firestore().collection("Users").doc(currentUser.phonenumber).collection("chats").doc(phonenumber).update({ 
           lastUpdatedAt: timeStamp,
           lastTextID: textID
          })
-         await firestore().collection("Users").doc(phonenumber).collection("chats").doc("+91" + loggedInUser).update({ 
+         await firestore().collection("Users").doc(phonenumber).collection("chats").doc(currentUser.phonenumber).update({ 
           lastUpdatedAt: timeStamp,
           lastTextID: textID
          })
       }else{
+        // chat doesn't exist, creating new one
         chatID = uuid.v4()
+        // saving text data
         const ref =  firestore().collection("Chats").doc(chatID).collection('_').doc(textID)
         await ref.set(data)
-        const ref_ = firestore().collection("Users").doc("+91" + loggedInUser).collection("chats").doc(phonenumber)
+        // for sender
+        const ref_ = firestore().collection("Users").doc(currentUser.phonenumber).collection("chats").doc(phonenumber)
         await ref_.set({
           'chatID': chatID.toString(),
           'phonenumber': userData.phonenumber,
@@ -213,16 +192,27 @@ export default function ChatScreen({ route, navigation }) {
           'lastUpdatedAt': timeStamp,
           'lastTextID': textID.toString()
         })
-        const ref__ = firestore().collection("Users").doc(phonenumber).collection("chats").doc("+91" + loggedInUser)
+        // for reciever
+        const ref__ = firestore().collection("Users").doc(phonenumber).collection("chats").doc(currentUser.phonenumber)
         await ref__.set({
           'chatID': chatID.toString(),
-          'phonenumber': loggedInUser,
+          'phonenumber': currentUser.phonenumber,
           'savedName': null,
           'lastUpdatedAt': timeStamp,
           'lastTextID': textID.toString()
         })
+        // for sender
+        const readMessagesRef = firestore().collection("Chats").doc(chatID.toString()).collection(currentUser.phonenumber).doc("ReadMessages")
+        await readMessagesRef.set({
+          ReadTextIDs: []
+        })
+        // for reciever
+        const readMessagesRef_ = firestore().collection("Chats").doc(chatID.toString()).collection(phonenumber).doc("ReadMessages")
+        await readMessagesRef_.set({
+          ReadTextIDs: []
+        })
       }
-      sendNotification.sendNotification({ text: text, savedName: userData.savedName, chatID: chatID, textID: textID, token: currentUser.token })
+      sendNotification.sendNotification({ text: text, savedName: userData.savedName, chatID: chatID, textID: textID, token: userData.token })
     }
   }
 
@@ -243,7 +233,7 @@ export default function ChatScreen({ route, navigation }) {
                 {
                   messageData && Object.keys(messageData).map((key) => {
                     // console.log(message)
-                    return <Message key={key} colors={ colors } received={messageData[key].receiver == "+91" + loggedInUser } seen={true} message={messageData[key]}/>
+                    return <Message key={key} colors={ colors } received={messageData[key].receiver == currentUser.phonenumber } seen={messageData[key].sender == currentUser.phonenumber ?  readMessages.includes(messageData[key].textID) : null } message={messageData[key]}/>
                   })
                 }
                 <View style={{ padding: 20 }}></View>

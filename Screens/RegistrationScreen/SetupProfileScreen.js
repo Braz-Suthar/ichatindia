@@ -125,16 +125,18 @@ export default function SetupProfileScreen({ route, navigation }) {
             const data = {
                 fullname: fullname,
                 password: password,
-                phonenumber: phonenumber,
+                phonenumber: '+91' + phonenumber,
                 coverPicture: coverPictureUrl,
                 profilePicture: profilePictureUrl,
                 isActive: true,
                 about: "Default",
                 token: token
             }
+            console.log(data)
             await firestore().collection("Users").doc("+91" + phonenumber).set(data)
             return true
         } catch (error) {
+            console.log(error)
             setErrors({ confirmPasswordError: 'Something went wrong. Please try again.' })
             return false
         }
