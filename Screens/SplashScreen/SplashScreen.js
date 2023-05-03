@@ -5,8 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore'
 import { login, logout } from './../../src/StateManagement/Slices/CurrentUserSlice'
 import { useDispatch } from 'react-redux'
-import Contacts, { getContactsByEmailAddress } from 'react-native-contacts';
+import Contacts from 'react-native-contacts';
 import { set } from './../../src/StateManagement/Slices/MobileContactsSlice'
+import { horizontalScalePercent, verticalScalePercent, horizontalScale, verticalScale, moderateScale } from './../../src/Metrics'
+
 
 export default function SplashScreen() {
 
@@ -111,7 +113,7 @@ export default function SplashScreen() {
         <>
             <StatusBar barStyle={ themeState === 'dark' ? 'light-content' : 'dark-content' } backgroundColor={ colors.bgPrimary } />
             <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary }}>
-                <Animated.Image source={require('../../Images/chat.png')} style={{ width: 80, height: 80, transform: [{ scale: imageScale.interpolate({ inputRange: [0,1], outputRange: [15, 1] }) }] }}/>
+                <Animated.Image source={require('../../Images/chat.png')} style={{ width: horizontalScale(70), height: horizontalScale(70), transform: [{ scale: imageScale.interpolate({ inputRange: [0,1], outputRange: [15, 1] }) }] }}/>
             </View>
         </>
     )
@@ -120,8 +122,8 @@ export default function SplashScreen() {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
-        height: '100%',
+        width: horizontalScalePercent(100),
+        height: verticalScalePercent(100),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

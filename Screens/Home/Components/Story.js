@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View, ScrollView } from "react-native"
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { horizontalScalePercent, verticalScalePercent, horizontalScale, verticalScale, moderateScale } from './../../../src/Metrics'
 
 
 const StoryUI = (props) => {
@@ -12,8 +13,8 @@ const StoryUI = (props) => {
             <View style={{ ...styles.storyUiOuter, borderColor: colors.blue, backgroundColor: colors.bgPrimary }}>
                 <View style={{ ...styles.storyui }}></View>
             </View>
-            <View style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-                <Text style={{ ...styles.storyText }} numberOfLines={1} ellipsizeMode={'tail'} >Braz Suthar</Text>
+            <View style={{ width: horizontalScale(85), display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+                <Text allowFontScaling={false} style={{ ...styles.storyText }} numberOfLines={1} ellipsizeMode={'tail'} >Braz Suthar</Text>
             </View>
         </View>
     )
@@ -27,10 +28,10 @@ export default function Story(props) {
     return(
         <View style={{ ...styles.mainContainer }}>
             <View style={{ ...styles.header }}>
-                <Text style={{ ...styles.headerText, color: colors.textPrimary }}>Story</Text>
-                <Ionicons name={'ios-add-outline'} size={ 32 } style={{ color: colors.blue, fontWeight: 'bold' }} />
+                <Text allowFontScaling={false} style={{ ...styles.headerText, color: colors.textPrimary }}>Story</Text>
+                <Ionicons name={'ios-add-outline'} size={ moderateScale(28) } style={{ color: colors.blue, fontWeight: 'bold' }} />
             </View>
-            <ScrollView style={{ paddingStart: 15, paddingEnd: 15 }} showsHorizontalScrollIndicator={false} contentInset={20} contentInsetAdjustmentBehavior={'scrollableAxes'} horizontal={true} alwaysBounceHorizontal={true}>
+            <ScrollView style={{ paddingStart: horizontalScale(10), paddingEnd: horizontalScale(10) }} showsHorizontalScrollIndicator={false} contentInset={20} contentInsetAdjustmentBehavior={'scrollableAxes'} horizontal={true} alwaysBounceHorizontal={true}>
                 <StoryUI colors={ colors }/>
                 <StoryUI colors={ colors }/>
                 <StoryUI colors={ colors }/>
@@ -39,7 +40,7 @@ export default function Story(props) {
                 <StoryUI colors={ colors }/>
                 <StoryUI colors={ colors }/>
                 <StoryUI colors={ colors }/>
-                <View style={{ width: 15 }}></View>
+                <View style={{ width: horizontalScale(20) }}></View>
             </ScrollView>
         </View>
     )
@@ -47,36 +48,36 @@ export default function Story(props) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
-        paddingTop: 10,
-        paddingBottom: 10,
+        width: horizontalScalePercent(100),
+        paddingTop: verticalScale(10),
+        paddingBottom: verticalScale(0),
     },
     header: {
         display: 'flex',
         flexDirection: 'row',
-        width: '100%',
+        width: horizontalScalePercent(100),
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingLeft: 15,
-        paddingRight: 15,
+        paddingLeft: horizontalScale(10),
+        paddingRight: horizontalScale(10),
     },
     headerText: {
-        fontSize: 32,
+        fontSize: moderateScale(28),
         fontWeight: 'bold'
     },
     story: {
-        width: 80,
-        height: 120,
-        marginRight: 10,
+        width: horizontalScale(80),
+        height: horizontalScale(105),
+        marginRight: horizontalScale(3),
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
         alignItems: 'center',
     },
     storyUiOuter: {
-        width: 80,
-        height: 80,
-        borderRadius: 50,
+        width: horizontalScale(74),
+        height: horizontalScale(74),
+        borderRadius: horizontalScale(37),
         borderStyle: 'solid',
         borderWidth: 2,
         display: 'flex',
@@ -85,12 +86,13 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     storyui: {
-        width: '90%',
-        height: '90%',
+        width: horizontalScale(66),
+        height: horizontalScale(66),
         backgroundColor: 'white',
-        borderRadius: 50,
+        borderRadius: horizontalScale(33),
     },
     storyText: {
-        marginTop: 5,
+        marginTop: verticalScale(2),
+        fontSize: moderateScale(12),
     }
 })

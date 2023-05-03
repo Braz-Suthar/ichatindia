@@ -10,6 +10,7 @@ import NewPopupScreen from '../ContactScreen/NewPopupScreen.js';
 import firestore from '@react-native-firebase/firestore'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector } from 'react-redux'
+import { horizontalScalePercent, verticalScalePercent, horizontalScale, verticalScale, moderateScale } from './../../src/Metrics'
 
 
 
@@ -31,6 +32,7 @@ export default function HomeScreen({ route, navigation }) {
   const [ showDPURL, setShowDPURL ] = useState(null)
   const [ showNewPopupScreen, setShowNewPopupScreen ] = useState(false)
   const [chatItems, setChatItems] = useState()
+  const [chatItemsTemp, setChatItemsTemp] = useState({})
 
   const setShowDPURLFunction = (url) => {
     setShowDPURL(url)
@@ -66,6 +68,7 @@ export default function HomeScreen({ route, navigation }) {
 
   useEffect(() => {
     if(mobileContacts) {
+      const chatItemDataTemp = []
       const onResult = async (QuerySnapshot) => {
           const lastChatCount = await AsyncStorage.getItem('chatCount')
           const chatCount = QuerySnapshot.size
@@ -74,48 +77,62 @@ export default function HomeScreen({ route, navigation }) {
           }else if(lastChatCount < chatCount) {
             await AsyncStorage.setItem('chatCount', chatCount.toString())
             const newChatItems = QuerySnapshot._docs.filter(doc => !doc._data.savedName)
-            newChatItems.forEach(chatItem => {
+            console.log(newChatItems)
+            const chatItemsCallback = async (data) => {
               let savedName = ''
-              if(mobileContacts[chatItem._data.phonenumber]){
-                savedName = mobileContacts[chatItem._data.phonenumber].fullname
+              if(mobileContacts[data.phonenumber]){
+                savedName = mobileContacts[data.phonenumber].fullname
               }else{
-                savedName = chatItem._data.fullname
+                savedName = data.fullname
               }
-              firestore().collection("Users").doc(currentUser.phonenumber).collection('chats').doc(chatItem._data.phonenumber).update({ savedName: savedName })
-            })
+              await firestore().collection("Users").doc(currentUser.phonenumber).collection('chats').doc(data.phonenumber).update({ savedName: savedName })
+            }
+
+            newChatItems.forEach(data => chatItemsCallback(data.data()))
+
+            // newChatItems.forEach(chatItem => {
+            //   let savedName = ''
+            //   if(mobileContacts[chatItem._data.phonenumber]){
+            //     savedName = mobileContacts[chatItem._data.phonenumber].fullname
+            //   }else{
+            //     savedName = chatItem._data.fullname
+            //   }
+            //   firestore().collection("Users").doc(currentUser.phonenumber).collection('chats').doc(chatItem._data.phonenumber).update({ savedName: savedName })
+            // })
           }
 
-          const chatItemDataTemp = []
-          QuerySnapshot.forEach((doc, index) => {
-            const itemData = doc.data()
-            const phonenumber = itemData.phonenumber
-            const chatID = itemData.chatID
-            const savedName = itemData.savedName
-            const lastTextID = itemData.lastTextID
-            firestore().collection("Users").doc(phonenumber).get().then(userData_ => {
-              const profilePicture = userData_.data().profilePicture
-              firestore().collection("Chats").doc(chatID).collection('_').doc(lastTextID).get().then(messageData => {
-                const data = messageData.data()
-                const chatItemData = {
-                  phonenumber: phonenumber,
-                  chatID: chatID,
-                  savedName: savedName,
-                  profilePicture: profilePicture,
-                  lastMessage: data.text,
-                  sentAt: data.sentAt,
-                  receivedAt: data.receivedAt,
-                  isRead: data.isRead,
-                  ...data
-                }
-                chatItemDataTemp.push(chatItemData)
-                if(index == QuerySnapshot.size - 1){
-                  setChatItems(chatItemDataTemp)
-                }
-              })
-            })
-          })
+          // for await (let snapshot of QuerySnapshot){
+          //   console.log(snapshot)
+          // }
+          // console.log(typeof QuerySnapshot)
+          
 
-      
+          const callback = async (data) => {
+            const phonenumber = data.phonenumber
+            const chatID = data.chatID
+            const savedName = data.savedName
+            const lastTextID = data.lastTextID
+            const userDataDetails = await firestore().collection("Users").doc(phonenumber).get()
+            const profilePicture = userDataDetails.data().profilePicture
+            const lastTextResult = await firestore().collection("Chats").doc(chatID).collection('_').doc(lastTextID).get()
+            const newTextsResult = await firestore().collection("Chats").doc(chatID).collection('_').where('sender', '==', phonenumber).where('isRead', '!=', true).get()
+            const newTextsCount = newTextsResult.size
+            const lastTextData = lastTextResult.data()
+            const chatItemData = {}
+            chatItemData[phonenumber] = {
+              phonenumber: phonenumber,
+              chatID: chatID,
+              savedName: savedName,
+              profilePicture: profilePicture,
+              lastMessage: lastTextData.text,
+              sentAt: lastTextData.sentAt,
+              receivedAt: lastTextData.receivedAt,
+              newTextsCount: newTextsCount,
+              ...lastTextData
+            }
+            setChatItemsTemp({ ...chatItemsTemp, ...chatItemData })
+          }
+          QuerySnapshot.forEach(data => callback(data.data()))
       }
       
       const onError = error => {
@@ -141,7 +158,7 @@ export default function HomeScreen({ route, navigation }) {
         <ScrollView style={{ ...styles.scrollView }} showsVerticalScrollIndicator={false} >
           <Search colors={ colors }/>
           <Story  colors={ colors }/>
-          <Chat colors={ colors } chatOnClick={ chatOnClick } loggedInUser={ currentUser } chatItems={ chatItems } addIconClickListner={showModal} dpOnClick={ setShowDPURLFunction } />
+          <Chat colors={ colors } chatOnClick={ chatOnClick } loggedInUser={ currentUser } chatItems={ Object.values(chatItemsTemp) } addIconClickListner={showModal} dpOnClick={ setShowDPURLFunction } />
         </ScrollView>
       </View>
       { showDPURL && <ShowDPModal unSetShowDPURL={ unSetShowDPURLFunction } colors={ colors } /> }
@@ -152,8 +169,8 @@ export default function HomeScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        height: '100%',
-        width: '100%',
+        height: verticalScalePercent(100),
+        width: horizontalScalePercent(100),
         display: 'flex',
         flexDirection: 'column',
     },

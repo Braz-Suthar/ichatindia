@@ -1,10 +1,9 @@
-import { CurrentRenderContext } from '@react-navigation/native';
-import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight, StatusBar, TextInput, ScrollView } from "react-native"
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Appearance, TouchableHighlight, ScrollView } from "react-native"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../../Colors'
 import IconView from './IconView';
-import { firebase } from './../../src/firebase/config'
+import storage from '@react-native-firebase/storage'
 import _ from './_'
 
 export default function FlatIconPickerScreen({ fn, hideFn }) {
@@ -23,7 +22,7 @@ export default function FlatIconPickerScreen({ fn, hideFn }) {
     const [imagesList, setImagesList] = useState([])
 
     async function fetchFlatIconsImages(){
-        const imageRefs = await firebase.storage().ref('/FlatIcons/').listAll()
+        const imageRefs = await storage().ref('/FlatIcons/').listAll()
         const urls = await Promise.all(imageRefs.items.map(ref => ref.getDownloadURL()))
         setImages(urls)
     }
@@ -41,12 +40,12 @@ export default function FlatIconPickerScreen({ fn, hideFn }) {
         <>
             <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary }}>
                 <ScrollView showsVerticalScrollIndicator={false} alwaysBounceVertical={true} style={{ ...styles.scrollViewContainer, backgroundColor: colors.bgPrimary }}>
-                    <View style={{ height: 20 }}></View>
+                    <View style={{ height: 20, backgroundColor: colors.bgPrimary }}></View>
                     { imagesList && imagesList.map((images, index) => <IconView fn={fn} key={index} data={images}/>)}
                     <View style={{ height: 80 }}></View>
                 </ScrollView>
                 <View  style={{ ...styles.buttonContainer }}>
-                    <TouchableHighlight style={{ ...styles.button, backgroundColor: colors.bgSecondary }} onPress={hideFn} >
+                    <TouchableHighlight underlayColor={ colors.bgPrimary } style={{ ...styles.button, backgroundColor: colors.bgSecondary }} onPress={hideFn} >
                         <>
                             <Ionicons name={'ios-close-circle-outline'} size={ 24 } style={{ color: colors.blue, marginRight: 12 }} />
                             <Text style={{ fontSize: 20, color: colors.textSecondary }}>Close FlatIcon Gallery</Text>

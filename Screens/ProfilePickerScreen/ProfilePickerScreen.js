@@ -1,6 +1,5 @@
-import { CurrentRenderContext } from '@react-navigation/native';
-import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight, StatusBar, TextInput, ScrollView } from "react-native"
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight } from "react-native"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../../Colors'
 
@@ -20,16 +19,16 @@ export default function ProfilePickerScreen({ galleryPickerFunction, hideModal, 
 
     return(
         <>
-            <TouchableHighlight onPress={ hideModal } style={{ ...styles.mainContainer, backgroundColor: colors.overlayBackgroundColor }}>
+            <TouchableHighlight onPress={ hideModal } underlayColor={ colors.bgPrimary } style={{ ...styles.mainContainer, backgroundColor: colors.overlayBackgroundColor }}>
                 <View style={{ ...styles.modalContainer, backgroundColor: colors.bgSecondary }}>
-                    <TouchableHighlight onPress={ showFlatIconPickerScreenFn } style={{ ...styles.galleryButton }}>
+                    <TouchableHighlight onPress={ showFlatIconPickerScreenFn } underlayColor={ colors.bgPrimary } style={{ ...styles.galleryButton }}>
                         <>
                             <Image source={require("./../../Images/FlatIconLogo.png")} style={{ width: 24, height: 24, marginRight: 12 }}/>
                             <Text style={{ ...styles.btnText, color: colors.textPrimary }}>Choose from FlatIcon</Text>
                         </>
                     </TouchableHighlight>
                     <View style={{ ...styles.lineBreak, borderColor: colors.bgPrimary }}></View>
-                    <TouchableHighlight onPress={ galleryPickerFunction } style={{ ...styles.galleryButton }}>
+                    <TouchableHighlight onPress={ galleryPickerFunction } style={{ ...styles.galleryButton }} underlayColor={ colors.bgPrimary }>
                         <>
                             <Ionicons name={'ios-images'} size={ 24 } style={{ color: colors.blue, marginRight: 12 }} />
                             <Text style={{ ...styles.btnText, color: colors.textPrimary }}>Choose from Gallery</Text>

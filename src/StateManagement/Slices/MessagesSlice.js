@@ -24,7 +24,7 @@ export const messagesSlice = createSlice({
         textData[action.payload.textID] = {
             ...action.payload.textData
         }
-        state.messages[action.payload.chatID] = textData
+        state.messages[action.payload.chatID] = { ...textData, ...state.messages[action.payload.chatID] }
     }
   },
 })

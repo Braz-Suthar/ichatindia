@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight, StatusBar, TextInput, ScrollView } from "react-native"
+import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight, StatusBar, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from "react-native"
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { StackActions } from '@react-navigation/native';
 import Colors from '../../Colors'
 import ImagePicker from 'react-native-image-crop-picker'
 import LoadingScreen from '../LoadingScreen/LoadingScreen';
@@ -14,8 +13,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import { login } from './../../src/StateManagement/Slices/CurrentUserSlice'
 import { useDispatch } from 'react-redux';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen'
 
-export default function SetupProfileScreen({ route, navigation }) {
+export default function SetupProfileScreen({ route }) {
 
     const [themeState, setThemeState] = useState(Appearance.getColorScheme() || 'light')
     const dispatch = useDispatch()
@@ -75,9 +75,9 @@ export default function SetupProfileScreen({ route, navigation }) {
                 cropperCircleOverlay: true,
                 enableRotationGesture: true,
             })
-            setProfilePicturePicked(imageData)
+            if(imageData)
+                setProfilePicturePicked(imageData)
         } catch (error) {
-            setProfilePicturePicked("")
             setErrors({ ...errors, profileError: 'Error while picking profile picture'  + error })
         }
     }
@@ -97,9 +97,9 @@ export default function SetupProfileScreen({ route, navigation }) {
                 cropperToolbarTitle: 'Edit Cover Picture',
                 enableRotationGesture: true,
             })
-            setCoverPicturePicked(imageData)
+            if(imageData)
+                setCoverPicturePicked(imageData)
         } catch (error) {
-            setCoverPicturePicked("")
             setErrors({ ...errors, coverError: 'Error while picking cover picture'  + error })
         }
     }
@@ -181,56 +181,53 @@ export default function SetupProfileScreen({ route, navigation }) {
     return(
         <>
             <StatusBar barStyle={ themeState === 'dark' ? 'light-content' : 'dark-content' } backgroundColor={ colors.bgPrimary } />
-            <ScrollView style={{ minHeight: '100%', backgroundColor: colors.bgPrimary }} scrollEnabled={false} showsVerticalScrollIndicator={false}>
-
-                <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary }}>
-                    <View style={{ ...styles.headerContainer}}>
-                        <View style={{ padding: 8 }}>
-                            <Text style={{ color: colors.blue, fontWeight: 'bold', fontSize: 50, }}>Setup Profile</Text>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ ...styles.keyboardAvoiding, backgroundColor: colors.bgPrimary }}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
+                    <View style={{ ...styles.mainContainer }}>
+                        <View style={{ ...styles.header }}>
+                            <Text style={{ ...styles.heading, color: colors.blue, }}>Setup Profile</Text>
                             <View style={{ display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-                                <TouchableHighlight onPress={ handleCoverPicker } style={{ ...styles.coverPhotoContainer }}>
+                                <TouchableHighlight onPress={ handleCoverPicker } underlayColor={ colors.bgPrimary } style={{ ...styles.coverPhotoContainer }}>
                                     <>
                                         <View style={{ ...styles.coverContainerOverlay, backgroundColor: colors.coverContainerOverlay }}></View>
-                                        <Image source={{ uri: coverPicturePicked.path }} style={{ width: 'auto', height: 150, borderRadius: 12 }}/>
+                                        <Image source={{ uri: coverPicturePicked.path }} style={{ width: 'auto', height: wp(50), borderRadius: wp(3) }}/>
                                     </>
                                 </TouchableHighlight>
-                                <TouchableHighlight onPress={() => setShowModal(true) } style={{ ...styles.dpContainer, backgroundColor: colors.bgPrimary }}>
-                                    <Image source={{ uri: profilePicturePicked.path }} style={{ width: 98, height: 98, borderRadius: 49 }} />
+                                <TouchableHighlight onPress={() => setShowModal(true) } underlayColor={ colors.bgPrimary } style={{ ...styles.dpContainer, backgroundColor: colors.bgPrimary }}>
+                                    <Image source={{ uri: profilePicturePicked.path }} style={{ width: wp(28), height: wp(28), borderRadius: wp(14) }} />
                                 </TouchableHighlight>
                             </View>
                             <View>
-                                <Text style={{ fontSize: 15, textAlign: 'center', color: colors.textSecondary, marginTop: 20, marginBottom: 20 }}>Click on above photos to replace them with yours.</Text>
-                            </View>
-                            <View style={{ ...styles.inputContainer, backgroundColor: colors.bgSecondary }}>
-                                <Ionicons name={'ios-person'} size={ 24 } style={{ color: colors.textSecondary, marginRight: 12 }} />
-                                <TextInput maxLength={20} keyboardType='default' onChange={ e => setFullname(e.nativeEvent.text ) } value={ fullname } textContentType='name' placeholder='Enter Full Name' style={{ ...styles.input, color: colors.textSecondary }} placeholderTextColor={ colors.textSecondary } />
-                            </View>
-                            <View style={{ ...styles.inputErrorContainer }}>
-                                <Text style={{ color: 'red' }}></Text>
-                            </View>
-                            <View style={{ ...styles.inputContainer, backgroundColor: colors.bgSecondary }}>
-                                <Ionicons name={'ios-lock-open'} size={ 24 } style={{ color: colors.textSecondary, marginRight: 12 }} />
-                                <TextInput keyboardType='default' onChange={e => setPassword(e.nativeEvent.text)} value={ password } placeholder='Set a password' style={{ ...styles.input, color: colors.textSecondary }} placeholderTextColor={ colors.textSecondary } />
-                            </View>
-                            <View style={{ ...styles.inputErrorContainer }}>
-                                <Text style={{ color: 'red' }}></Text>
-                            </View>
-                            <View style={{ ...styles.inputContainer, backgroundColor: colors.bgSecondary }}>
-                                <Ionicons name={'ios-lock-closed'} size={ 24 } style={{ color: colors.textSecondary, marginRight: 12 }} />
-                                <TextInput keyboardType='default' onChange={ e => {setConfirmPassword(e.nativeEvent.text);setErrors({ ...errors, confirmPasswordError: null })} } value={ confirmPassword } textContentType='password' placeholder='Confirm password' style={{ ...styles.input, color: colors.textSecondary }} placeholderTextColor={ colors.textSecondary } />
-                            </View>
-                            <View style={{ ...styles.inputErrorContainer }}>
-                                <Text style={{ color: 'red' }}>{ errors && errors.confirmPasswordError }</Text>
+                                <Text style={{ fontSize: 15, textAlign: 'center', color: colors.textSecondary, marginTop: wp(3), marginBottom: wp(3) }}>Click on above photos to replace them with yours.</Text>
                             </View>
                         </View>
+                        <View style={{ ...styles.middle }}>
+                            <View style={{ ...styles.inputContainer }}>
+                                <View style={{ ...styles.textInputContainer, backgroundColor: colors.bgSecondary }}>
+                                    <Ionicons name={'ios-person'} size={ wp(6) } style={{ color: colors.textSecondary }}/>
+                                    <TextInput returnKeyType='next' maxLength={20} keyboardType='default' onChange={ e => setFullname(e.nativeEvent.text ) } value={ fullname } textContentType='name' placeholder='Enter Full Name' placeholderTextColor={ colors.textSecondary } style={{ ...styles.textinput, color: colors.textSecondary }} />
+                                </View>
+                                <View style={{ ...styles.textInputContainer, backgroundColor: colors.bgSecondary }}>
+                                    <Ionicons name={'ios-lock-open'} size={ wp(6) } style={{ color: colors.textSecondary }}/>
+                                    <TextInput returnKeyType='next' keyboardType='default' onChange={e => setPassword(e.nativeEvent.text)} value={ password } placeholder='Set a password' placeholderTextColor={ colors.textSecondary } style={{ ...styles.textinput, color: colors.textSecondary }} />
+                                </View>
+                                <View style={{ ...styles.textInputContainer, backgroundColor: colors.bgSecondary }}>
+                                    <Ionicons name={'ios-lock-closed'} size={ wp(6) } style={{ color: colors.textSecondary }}/>
+                                    <TextInput returnKeyType='done' keyboardType='default' onChange={ e => {setConfirmPassword(e.nativeEvent.text);setErrors({ ...errors, confirmPasswordError: null })} } value={ confirmPassword } textContentType='password' placeholder='Confirm password' placeholderTextColor={ colors.textSecondary } style={{ ...styles.textinput }} />
+                                </View>
+                                <View style={{ ...styles.inputErrorContainer }}>
+                                    <Text style={{ color: 'red' }}>{ errors && errors.confirmPasswordError }</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={{ ...styles.footer }}>
+                            <TouchableHighlight disabled={ !inputVerified } onPress={ handleCreateProfileClick } style={{ ...styles.button, backgroundColor: inputVerified ? colors.blue : colors.disabledBlue}} underlayColor='#278eff' >
+                                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20}}>Setup Profile</Text>
+                            </TouchableHighlight>
+                        </View>
                     </View>
-                    <View style={{ ...styles.footerContainer }}>
-                        <TouchableHighlight disabled={ !inputVerified } onPress={ handleCreateProfileClick } style={{ ...styles.buttonContainer, backgroundColor: inputVerified ? colors.blue : colors.disabledBlue }} underlayColor='#278eff' >
-                            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20}}>Setup Profile</Text>
-                        </TouchableHighlight>
-                    </View>
-                </View>
-            </ScrollView>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
             { showLoading && <LoadingScreen text={"Creating Account..."}/>}
             { showModal && <ProfilePickerScreen hideModal={ hideModal } showFlatIconPickerScreenFn={ showFlatIconPickerScreenFn } galleryPickerFunction={ handleProfilePicker } /> }
             { showFlatIconPickerScreen && <FlatIconPickerScreen hideFn={ hideFlatIconPickerScreenFn } fn={ setProfilePictureFn } /> }
@@ -240,72 +237,91 @@ export default function SetupProfileScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+    keyboardAvoiding: {
+        padding: wp(6),
+        width: wp('100%'),
+        height: hp('100%'),
+    },
     mainContainer: {
-        width: '100%',
-        height: '100%',
+        flex: 1,
+    },
+    header: {
         display: 'flex',
         flexDirection: 'column',
-    },
-    headerContainer: {
-        padding: 25
-    },
-    footerContainer: {
-        display: 'flex',
-        flexDirection: 'column-reverse',
+        justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        paddingBottom: 10
+    },
+    heading: {
+        fontSize: 38,
+        fontWeight: 'bold',
+        width: wp('90%'),
     },
     coverPhotoContainer: {
-        width: '100%',
-        height: 150,
-        marginTop: 50,
-        borderRadius: 12,
+        width: wp('90%'),
+        height: wp(50),
+        marginTop: wp(5),
+        borderRadius: wp(3),
     },
     coverContainerOverlay: {
-        width: '100%',
-        height: 150,
+        width: wp('90%'),
+        height: wp(50),
         position: 'absolute',
         zIndex: 1,
     },
     dpContainer: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginTop: -50,
+        width: wp(30),
+        height: wp(30),
+        borderRadius: wp(15),
+        marginTop: wp(-15),
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    buttonContainer: {
+    middle: {
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    inputContainer: {
+        width: wp('80%'),
+    },
+    textInputContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: wp(3),
+        marginVertical: wp(3),
+        paddingHorizontal: wp(3)
+    },
+    textinput: {
+        margin: 0,
+        fontSize: 18,
+        flexGrow: 1,
+        paddingVertical: wp(1.5),
+        paddingHorizontal: wp(2.5),
+        width: wp('70%')
+    },
+    footer: {
+        paddingVertical: wp(4),
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+    button: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '70%',
-        padding: 15,
-        borderRadius: 12,
-        marginTop: 120
-    },
-    inputContainer: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 15,
-        marginVertical: 7
-    }, 
-    input: {
-        padding: 7,
-        fontSize: 20,
-        flexGrow: 1,
+        width: wp('80%'),
+        padding: wp(3),
+        borderRadius: wp(3),
     },
     inputErrorContainer: {
-        width: '100%',
+        width: wp('80%'),
         display: 'flex',
         flexDirection: 'row-reverse',
-        paddingHorizontal: 5
+        paddingHorizontal: wp(1)
     }
 })

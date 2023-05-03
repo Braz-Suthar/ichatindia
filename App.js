@@ -23,8 +23,6 @@ function App() {
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
   }, [])
 
-  
-
   return (
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>

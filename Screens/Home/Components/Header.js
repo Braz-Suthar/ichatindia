@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native"
 import About from './About'
 import ProfilePicture from './ProfilePicture'
 import Username from './Username'
+import { horizontalScalePercent, verticalScalePercent, horizontalScale, verticalScale, moderateScale } from './../../../src/Metrics'
 
 export default function Header(props) {
 
@@ -13,11 +14,11 @@ export default function Header(props) {
     return(
         <View style={{ ...styles.mainContainer }}>
             <View style={{ ...styles.leftContainer }}>
-                <Username username={ fullname } dpURL={ profilePicture }  colors={ props.colors } customStyle={{ fontWeight: 'bold', fontSize: 36 }} />
-                <About about={ about } colors={ props.colors } customStyle={{ fontSize: 18 }}/>
+                <Username username={ fullname } dpURL={ profilePicture }  colors={ props.colors } customStyle={{ fontWeight: 'bold', fontSize: moderateScale(28) }} />
+                <About about={ about } colors={ props.colors } customStyle={{ fontSize: moderateScale(14) }}/>
             </View>
             <View style={{ ...styles.rightContainer }}>
-                <ProfilePicture customStyle={{ width: 60, height: 60 }} dpURL={ profilePicture } dpOnClick={ props.dpOnClick } />
+                <ProfilePicture customStyle={{ width: horizontalScale(53), height: horizontalScale(53) }} dpURL={ profilePicture } dpOnClick={ props.dpOnClick } />
             </View>
         </View>
     )
@@ -25,19 +26,19 @@ export default function Header(props) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
+        width: horizontalScalePercent(100),
         display: 'flex',
         flexDirection: 'row',
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 15,
-        paddingRight: 15,
+        paddingTop: verticalScale(5),
+        paddingBottom: verticalScale(5),
+        paddingLeft: horizontalScale(10),
+        paddingRight: horizontalScale(10),
     },
     leftContainer: {
-        width: '77%',
+        width: horizontalScalePercent(74),
     },
     rightContainer: {
-        width: '22%',
+        width: horizontalScalePercent(21),
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',

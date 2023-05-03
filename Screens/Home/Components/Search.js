@@ -1,19 +1,20 @@
 import React from 'react'
 import { StyleSheet, View, TextInput } from "react-native"
 import Ionicons from 'react-native-vector-icons/Ionicons'
-
+import { horizontalScalePercent, verticalScalePercent, horizontalScale, verticalScale, moderateScale } from './../../../src/Metrics'
 
 export default function Search(props) {
 
     const colors = props.colors
     return(
         <View style={{ ...styles.mainContainer }}>
-            <View style={{ display: 'flex', flexDirection: 'row', backgroundColor: colors.bgSecondary, width: '100%', paddingTop: 5, paddingBottom: 5, borderRadius: 10 }}>
+            <View style={{ display: 'flex', flexDirection: 'row', backgroundColor: colors.bgSecondary, width: horizontalScalePercent(95.5), paddingTop: verticalScale(2), paddingBottom: verticalScale(2), borderRadius: moderateScale(6) }}>
                 <View style={{ ...styles.leftContainer }}>
-                    <Ionicons name={'ios-search-outline'} size={ 18 } style={{ color: colors.textSecondary }} />
+                    <Ionicons name={'ios-search-outline'} size={ moderateScale(17) } style={{ color: colors.textSecondary }} />
                 </View>
                 <View style={{ ...styles.rightContainer }}>
                     <TextInput 
+                        allowFontScaling={false}
                         placeholder='Search chat, group or text'
                         placeholderTextColor={colors.textSecondary}
                         multiline={false}
@@ -28,25 +29,26 @@ export default function Search(props) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 15,
-        paddingRight: 15,
+        width: horizontalScalePercent(100),
+        paddingTop: verticalScale(12),
+        paddingBottom: verticalScale(10),
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
     },
     leftContainer: {
-        width: '15%',
+        width: horizontalScalePercent(14),
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
     },
     rightContainer: {
-        width: '80%',
+        width: horizontalScalePercent(80),
     },
     textInput: {
         padding: 0,
-        fontSize: 18,
-        width: '100%',
+        fontSize: moderateScale(15),
+        width: horizontalScalePercent(76),
     }
 })

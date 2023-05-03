@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StatusBar, Appearance, StyleSheet, ScrollView, Image , TextInput, TouchableHighlight } from 'react-native';
 import Colors from '../../Colors.js';
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import Icon from 'react-native-vector-icons/Octicons'
 import Username from '../Home/Components/Username.js';
 import About from '../Home/Components/About.js'
 import ProfilePicture from '../Home/Components/ProfilePicture.js';
@@ -11,7 +11,6 @@ import firestore from '@react-native-firebase/firestore'
 import uuid from 'react-native-uuid'
 import sendNotification from './sendNotification.js';
 import { useSelector } from 'react-redux';
-
 
 export default function ChatScreen({ route, navigation }) {
 
@@ -32,12 +31,11 @@ export default function ChatScreen({ route, navigation }) {
   const [messageData, setMessageData] = useState({})  // all messages
   const [text, setText] = useState() // message
   const [inputRef, setInputRef] = useState()  // text input reference
-  const [readMessages, setReadMessages] = useState([])
+  const [height, setHeight] = useState(0)
   
   
   useEffect(() => {
     const getData = async () => {
-      console.log(phonenumber)
       try {
         let data = {}
         const chatRef = firestore().collection('Users').doc(currentUser.phonenumber).collection('chats').doc(phonenumber)
@@ -59,83 +57,52 @@ export default function ChatScreen({ route, navigation }) {
 
 
   useEffect(() => {
-    let subscriber
     let subscriber_
-    
-    if(userData){
-      
-      const onResult = async (QuerySnapshot) => {
-        console.log(QuerySnapshot.data().ReadTextIDs.length)
-        setReadMessages(QuerySnapshot.data().ReadTextIDs)
-      }
+    let subscriber__
 
-      const onError = (error) => {
-        console.log(error)
-      }
-      subscriber_ = firestore().collection("Chats").doc(userData.chatID).collection(userData.phonenumber).doc('ReadMessages').onSnapshot(onResult, onError)
-    }
 
     if(userData){
-      let c = null
       const onResult = async (QuerySnapshot) => {
         let d = {}
-        const readTextIDs = []
+        
         QuerySnapshot.forEach(snapshot => {
-          // console.log(snapshot.data())
           const data = snapshot.data()
-          if(data.receiver == currentUser.phonenumber)
-            readTextIDs.push(data.textID)
           const _ = { ...data }
           d[data.textID] = _
         })
+        
 
         setMessageData({ ...d })
         d = {}
-        await firestore().collection("Chats").doc(userData.chatID).collection(currentUser.phonenumber).doc('ReadMessages').set({
-          ReadTextIDs: [ ...readTextIDs ]
-        })
-        
-        // if(c == null){
-        //   c = [ ...changes ]
-        //   // console.log("if")
-        //   c.forEach(change => {
-        //     // console.log("change.doc.data()")
-        //     const d_ = change.doc.data()
-        //     d = { ...d, [d_.textID]: d_ }
-        //   })
-        //   // console.log(d)
-        //   setMessageData({ ...d, ...messageData })
-        //   d = {}
-        // }else if(changes.length) {
-        //   // console.log("else")
-        //   changes.forEach(change => {
-        //     // console.log(change.doc.data())
-        //     const d_ = change.doc.data()
-        //     d = { ...d, [d_.textID]: d_ }
-        //   })
-        //   setMessageData({ ...d, ...messageData })
-        //   d = {}
-        // }
-        // console.log(c)
-        // changes.forEach(change => {
-        //   // console.log("----->", change.doc)
-          
-        // })
-        // QuerySnapshot.forEach(element => {
-        //   const d_ = element.data()
-        //   d = { ...d, [d_.textID]: d_ }
-        // })
       }
 
       const onError = error => {
         console.log(error)
       }
 
-      subscriber = firestore().collection("Chats").doc(userData.chatID).collection('_').orderBy('sentAt', 'desc').onSnapshot({ includeMetadataChanges: true }, onResult, onError)
+      subscriber_ = firestore().collection("Chats").doc(userData.chatID).collection('_').orderBy('sentAt', 'desc').onSnapshot({ includeMetadataChanges: true }, onResult, onError)
     }
 
-    if(subscriber) return () => subscriber()
+    if(userData){
+
+      const onResult = async (QuerySnapshot) => {
+        const batch = firestore().batch()
+        QuerySnapshot.forEach(snapshot => {
+          batch.update(firestore().collection('Chats').doc(userData.chatID).collection('_').doc(snapshot.data().textID), {isRead: true})
+        })
+
+        await batch.commit()
+      }
+
+      const onError = error => {
+        console.log(error)
+      }
+
+      firestore().collection("Chats").doc(userData.chatID).collection('_').where('sender', '==', userData.phonenumber).where('isRead', '!=', true).onSnapshot({ includeMetadataChanges: true }, onResult, onError)
+    }
+
     if(subscriber_) return () => subscriber_()
+    if(subscriber__) return () => subscriber__()
   }, [userData])
 
   const sendMessage = async () => {
@@ -201,16 +168,6 @@ export default function ChatScreen({ route, navigation }) {
           'lastUpdatedAt': timeStamp,
           'lastTextID': textID.toString()
         })
-        // for sender
-        const readMessagesRef = firestore().collection("Chats").doc(chatID.toString()).collection(currentUser.phonenumber).doc("ReadMessages")
-        await readMessagesRef.set({
-          ReadTextIDs: []
-        })
-        // for reciever
-        const readMessagesRef_ = firestore().collection("Chats").doc(chatID.toString()).collection(phonenumber).doc("ReadMessages")
-        await readMessagesRef_.set({
-          ReadTextIDs: []
-        })
       }
       sendNotification.sendNotification({ text: text, savedName: userData.savedName, chatID: chatID, textID: textID, token: userData.token })
     }
@@ -221,19 +178,24 @@ export default function ChatScreen({ route, navigation }) {
         <StatusBar barStyle={ themeState === 'dark' ? 'light-content' : 'dark-content' } backgroundColor={ colors.bgPrimary } />
         <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary }}>
             <View style={{ ...styles.header }}>
+                <TouchableHighlight onPress={() => navigation.goBack() } underlayColor={ colors.bgPrimary } style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <Ionicons name={'ios-chevron-back'} size={ 34 } style={{ color: colors.textSecondary, marginLeft: -8 }} />
+                </TouchableHighlight>
                 <View style={{ ...styles.headerLeft}}>
                     <Username username={ userData && (userData.savedName ? userData.savedName : userData.fullname) } customStyle={{ fontSize: 34 }} colors={ colors } />
-                    <About about={ userData && userData.about } customStyle={{ fontSize: 15 }} colors={ colors } />
+                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
+                      <Icon name={'dot-fill'} size={ 18 } style={{ color: 'green', marginRight: 5 }} />
+                      <About about={ userData && userData.about } customStyle={{ fontSize: 15 }} colors={ colors } />
+                    </View>
                 </View>
-                <View style={{ ...styles.dpOuter, backgroundColor: colors.blue}}>
+                <View style={{ ...styles.dpOuter, backgroundColor: colors.bgPrimary }}>
                     <ProfilePicture dpURL={ userData && userData.profilePicture } dpOnClick={(url) => { console.log(url) }} customStyle={{ width: 50, height: 50 }}/>
                 </View>
             </View>
             <ScrollView keyboardDismissMode={'on-drag'} showsVerticalScrollIndicator={false} paddingVertical={20} style={{ ...styles.textScrollView, transform: [{ scaleY: -1 }]}}>
                 {
                   messageData && Object.keys(messageData).map((key) => {
-                    // console.log(message)
-                    return <Message key={key} colors={ colors } received={messageData[key].receiver == currentUser.phonenumber } seen={messageData[key].sender == currentUser.phonenumber ?  readMessages.includes(messageData[key].textID) : null } message={messageData[key]}/>
+                    return <Message key={key} colors={ colors } received={messageData[key].receiver == currentUser.phonenumber } message={messageData[key]}/>
                   })
                 }
                 <View style={{ padding: 20 }}></View>
@@ -241,7 +203,7 @@ export default function ChatScreen({ route, navigation }) {
             <View style={{ ...styles.footer}}>
               <Ionicons name={'ios-attach'} size={ 24 } style={{ color: colors.textSecondary, padding: 6 }} />
               <Ionicons name={'ios-happy-outline'} size={ 24 } style={{ color: colors.textSecondary, padding: 6 }} />
-              <TextInput multiline={ true } ref={input => { setInputRef(input) }} onChangeText={(text_) => { setText(text_) }} style={{ ...styles.textInput, backgroundColor: colors.bgSecondary, color: colors.textPrimary }} placeholderTextColor={ colors.textPrimary } placeholder='type your message here'/>
+              <TextInput multiline={ true } onContentSizeChange={(event) => {setHeight(event.nativeEvent.contentSize.height)}} ref={input => { setInputRef(input) }} onChangeText={(text_) => { setText(text_) }} style={{ ...styles.textInput, backgroundColor: colors.bgSecondary, color: colors.textPrimary, maxHeight: 80 }} placeholderTextColor={ colors.textPrimary } placeholder='type your message here'/>
               <TouchableHighlight onPress={sendMessage}>
                 <Ionicons name={'ios-paper-plane-outline'} size={ 24 } style={{ color: colors.textSecondary, padding: 6 }} />
               </TouchableHighlight>
@@ -267,7 +229,7 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   headerLeft: {
-    width: '80%',
+    width: '70%',
   },
   dpOuter: {
     width: 52,

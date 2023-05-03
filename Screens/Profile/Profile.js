@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from './../../src/StateManagement/Slices/CurrentUserSlice'
 
+
 export default function ProfileScreen({ route, navigation }) {
 
   const [themeState, setThemeState] = useState(Appearance.getColorScheme() || 'light')

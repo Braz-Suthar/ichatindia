@@ -90,6 +90,7 @@ export default function ContactScreen({ route, navigation }) {
 
     const createGroupReq = route.params.createGroupReq
     const colors = route.params.colors
+    const currentUser = useSelector((state) => state.currentUser.currentUser)
 
     const [ichatUserContactList, setIchatUserContactList] = useState()
     const [selectedContact, setSelectedContact] = useState()
@@ -154,11 +155,13 @@ export default function ContactScreen({ route, navigation }) {
             const _ = []
             async function getIchatUserContacts(){
                 for await (const contact of Object.keys(mobileContacts)){
-                    const user = await firestore().collection("Users").doc(mobileContacts[contact].phonenumber).get()
-                    if(user.exists){
-                        const userData = user.data()
-                        const cont = { uuid: uuid.v4(), fullname: mobileContacts[contact].fullname, phonenumber: mobileContacts[contact].phonenumber, about: userData.about, profilePicture: userData.profilePicture}
-                        _.push(cont)
+                    if(mobileContacts[contact].phonenumber != currentUser.phonenumber){
+                        const user = await firestore().collection("Users").doc(mobileContacts[contact].phonenumber).get()
+                        if(user.exists){
+                            const userData = user.data()
+                            const cont = { uuid: uuid.v4(), fullname: mobileContacts[contact].fullname, phonenumber: mobileContacts[contact].phonenumber, about: userData.about, profilePicture: userData.profilePicture}
+                            _.push(cont)
+                        }
                     }
                 }
                 return Promise.resolve(_)
@@ -181,7 +184,7 @@ export default function ContactScreen({ route, navigation }) {
         <>
             <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary}}>
                 <View style={{ ...styles.header }}>
-                    <TouchableHighlight onPress={() => navigation.goBack() }>
+                    <TouchableHighlight onPress={() => navigation.goBack()} underlayColor={ colors.bgPrimary }>
                         <Ionicons name={'ios-chevron-back'} size={ 32 } style={{ color: colors.blue, fontWeight: 'bold', marginRight: 10 }} />
                     </TouchableHighlight>
                     <Text style={{ ...styles.headerText, color: colors.textPrimary }}>{ createGroupReq ? 'Create New Group' : 'Chat Individualy'}</Text>

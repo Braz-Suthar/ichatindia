@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import ProfilePicture from './ProfilePicture'
 import Username from './Username'
 import { useSelector } from 'react-redux'
+import { horizontalScalePercent, verticalScalePercent, horizontalScale, verticalScale, moderateScale } from './../../../src/Metrics'
 
 
 
@@ -14,27 +15,27 @@ const ChatItem = (props) => {
     const chatOnClick = props.chatOnClick
     const dpOnClick = props.dpOnClick
     const chatItem = props.chatItem
-    const currentUserPhonenumber = props.currentUserPhonenumber
+    console.log(chatItem)
     
     return(
-        <TouchableHighlight onPress={ () => { chatOnClick(chatItem) } }>
+        <TouchableHighlight onPress={ () => { chatOnClick(chatItem) } } underlayColor={ colors.bgPrimary }>
             <View style={{ ...styles.chatItem, backgroundColor: colors.bgSecondary}}>
                 <View style={{ ...styles.chatItemLeft }} >
-                    <ProfilePicture dpURL={ dpURL } dpOnClick={ dpOnClick } customStyle={{ width: 50, height: 50 }}/>
+                    <ProfilePicture dpURL={ dpURL } dpOnClick={ dpOnClick } customStyle={{ width: horizontalScale(50), height: horizontalScale(50) }}/>
                 </View>
                 
                 <View style={{ ...styles.chatItemMiddle }}>
-                    <Username username={ props.chatItem.savedName || props.chatItem.phonenumber } colors={ colors } customStyle={{ fontSize: 25, marginTop: -5 }}/>
+                    <Username username={ props.chatItem.savedName || props.chatItem.phonenumber } colors={ colors } customStyle={{ fontSize: moderateScale(15), marginTop: -3 }}/>
                     <View style={{ ...styles.chatItemTextView }}>
-                        { chatItem && chatItem.sender == currentUserPhonenumber && <Ionicons name={ chatItem.isSent && chatItem.isReceived ? 'ios-checkmark-done' : chatItem.isSent && !chatItem.isReceived ? 'ios-checkmark' : 'ios-hourglass-outline' } size={ 14 } style={{ color: chatItem.isReceived && chatItem.isRead ? colors.blue : colors.textSecondary }}/>}
-                        <Text style={{ ...styles.textMessage, color: colors.textSecondary }} ellipsizeMode={'tail'} numberOfLines={1}>{ props.chatItem.lastMessage }</Text>
+                        { chatItem.sender == props.currentUserPhonenumber && (chatItem.isReceived ? chatItem.isRead  ? <Ionicons name={'ios-checkmark-done'} size={ moderateScale(11.5) } style={{ color: colors.blue }}/> : <Ionicons name={'ios-checkmark-done'} size={ moderateScale(11.5) } style={{ color: colors.textSecondary }}/> : <Ionicons name={'ios-checkmark'} size={ moderateScale(11.5) } style={{ color: colors.textSecondary }}/>)}
+                        <Text allowFontScaling={false} style={{ ...styles.textMessage, color: colors.textSecondary }} ellipsizeMode={'tail'} numberOfLines={1}>{ props.chatItem.lastMessage }</Text>
                     </View>
                 </View>
                 <View style={{ ...styles.chatItemRight }}>
-                    <Text style={{ color: colors.textSecondary }}>11/07/22</Text>
-                    <View style={{ ...styles.newMessagesBadge, backgroundColor: colors.blue}}>
-                        <Text style={{ color: 'white' }}>99</Text>
-                    </View>
+                    <Text allowFontScaling={false} style={{ color: colors.textSecondary, fontSize: moderateScale(9) }}>11/07/22</Text>
+                    {chatItem.newTextsCount > 0 && <View style={{ ...styles.newMessagesBadge, backgroundColor: colors.blue}}>
+                        <Text allowFontScaling={false} style={{ color: 'white', fontSize: moderateScale(9) }}>{ chatItem.newTextsCount }</Text>
+                    </View>}
                 </View>
             </View>
         </TouchableHighlight>
@@ -50,12 +51,12 @@ export default function Chat(props) {
     return(
         <View style={{ ...styles.mainContainer }}>
             <View style={{ ...styles.header }}>
-                <Text style={{ ...styles.headerText, color: colors.textPrimary }}>Chat</Text>
-                <TouchableHighlight onPress={addIconClick}>
-                    <Ionicons name={'ios-add-outline'} size={ 32 } style={{ color: colors.blue, fontWeight: 'bold' }} />
+                <Text allowFontScaling={false} style={{ ...styles.headerText, color: colors.textPrimary }}>Chat</Text>
+                <TouchableHighlight onPress={addIconClick} underlayColor={ colors.bgPrimary }>
+                    <Ionicons name={'ios-add-outline'} size={ moderateScale(28) } style={{ color: colors.blue, fontWeight: 'bold' }} />
                 </TouchableHighlight>
             </View>
-            <ScrollView style={{ ...styles.scrollView }} vertical={true} verticalScroll={true} contentInsetAdjustmentBehavior={'scrollableAxes'} >
+            <ScrollView style={{ ...styles.scrollView, }} vertical={true} verticalScroll={true} contentInsetAdjustmentBehavior={'scrollableAxes'} >
                 { props.chatItems && props.chatItems.map(chatItem => {
                     return<>
                         <ChatItem colors={ colors } key={chatItem.chatID} chatItem={ chatItem } currentUserPhonenumber={ currentUser.phonenumber } chatOnClick={ props.chatOnClick } dpOnClick={ props.dpOnClick } />
@@ -68,47 +69,48 @@ export default function Chat(props) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
-        paddingTop: 10,
-        paddingBottom: 10,
+        width: horizontalScalePercent(100),
+        paddingTop: verticalScale(20),
+        paddingBottom: verticalScale(10),
     },
     header: {
         display: 'flex',
         flexDirection: 'row',
-        width: '100%',
+        width: horizontalScalePercent(100),
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingLeft: 15,
-        paddingRight: 15,
+        paddingLeft: horizontalScale(10),
+        paddingRight: horizontalScale(10),
     },
     headerText: {
-        fontSize: 32,
+        fontSize: moderateScale(28),
         fontWeight: 'bold'
     },
     chatItem: {
-        width: '100%',
+        width: horizontalScalePercent(93),
         borderRadius: 12,
-        padding: 8,
+        padding: moderateScale(8),
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 3
+        marginBottom: verticalScale(2),
     }, 
     scrollView: {
-        padding: 15
+        padding: moderateScale(10)
     },
     textMessage: {
-        fontSize: 14
+        fontSize: moderateScale(10),
+        marginLeft: moderateScale(3)
     },
     chatItemLeft: {
-        width: '15%',
-        borderRadius: 50
+        width: horizontalScale(50),
+        borderRadius: horizontalScale(25),
     },
     chatItemMiddle: {
-        marginLeft: 10,
+        marginLeft: horizontalScale(10),
         display: 'flex',
         flexDirection: 'column',
-        width: '68%',
+        width: horizontalScalePercent(60),
     },
     chatItemRight: {
         display: 'flex',
@@ -120,17 +122,18 @@ const styles = StyleSheet.create({
     chatItemTextView: {
         display: 'flex',
         flexDirection: 'row',
-        width: '100%',
-        marginTop: 1
+        width: horizontalScalePercent(56),
+        marginTop: verticalScale(1.5),
+        alignItems: 'center',
     },
     newMessagesBadge: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        borderRadius: 5,
-        width: 22,
-        height: 22,
-        marginTop: 6
+        borderRadius: moderateScale(4),
+        width: horizontalScale(18),
+        height: horizontalScale(18),
+        marginTop: moderateScale(5)
     }
 })

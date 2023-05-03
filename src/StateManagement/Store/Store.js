@@ -9,6 +9,10 @@ const store = configureStore({
     mobileContacts: mobileContactsReducer,
     messages: messagesSliceReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false
+    }),
 })
 
 export default store

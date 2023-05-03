@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight, StatusBar } from "react-native"
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../../Colors'
-import LoadingScreen from '../LoadingScreen/LoadingScreen';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen'
 
 export default function WelcomeScreen({ route, navigation }) {
 
@@ -23,7 +22,7 @@ export default function WelcomeScreen({ route, navigation }) {
             <StatusBar barStyle={ themeState === 'dark' ? 'light-content' : 'dark-content' } backgroundColor={ colors.bgPrimary } />
             <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary }}>
                 <View style={{ ...styles.headerContainer}}>
-                    <Image source={require('../../Images/chat.png')} style={{ width: 80, height: 80 }}/>
+                    <Image source={require('../../Images/chat.png')} style={{ width: wp(20), height: wp(20) }}/>
                 </View>
                 <View style={{ ...styles.footerContainer}}>
                     <TouchableHighlight onPress={() => navigation.navigate('RegistrationScreen') } style={{ ...styles.buttonContainer, backgroundColor: colors.bgSecondary}} underlayColor={ colors.secondaryButtonOverlay } >
@@ -41,8 +40,8 @@ export default function WelcomeScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
-        height: '100%',
+        width: wp('100%'),
+        height: hp('100%'),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -52,24 +51,24 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '50%',
+        height: hp('50%'),
     },
     footerContainer: {
         display: 'flex',
         flexDirection: 'column-reverse',
         alignItems: 'center',
-        width: '100%',
-        height: '50%',
-        paddingBottom: 40
+        width: wp('100%'),
+        height: hp('50%'),
+        paddingBottom: wp(10)
     },
     buttonContainer: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '70%',
-        padding: 15,
-        borderRadius: 12,
-        marginBottom: 12
+        width: wp('70%'),
+        padding: wp(3),
+        borderRadius: wp(2.5),
+        marginBottom: wp(5)
     }
 })

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight, StatusBar, TextInput, ScrollView } from "react-native"
+import { Text, View, StyleSheet, Appearance, KeyboardAvoidingView, TouchableHighlight, StatusBar, TextInput, TouchableWithoutFeedback, Keyboard, Platform } from "react-native"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { StackActions } from '@react-navigation/native';
 import Colors from '../../Colors'
 import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import auth from '@react-native-firebase/auth'
 import firestore from '@react-native-firebase/firestore'
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen'
 
-export default function RegistrationScreen({ route, navigation }) {
+export default function RegistrationScreen({ navigation }) {
 
     const [themeState, setThemeState] = useState(Appearance.getColorScheme() || 'light')
 
@@ -73,7 +74,6 @@ export default function RegistrationScreen({ route, navigation }) {
         if(!otpError){
             setErrorMessage("")
         }
-        console.log(event.nativeEvent.text)
         if(event.nativeEvent.text.length == 10){
             setShowLoading(true)
             setLaodingText("Sending Code...")
@@ -104,46 +104,54 @@ export default function RegistrationScreen({ route, navigation }) {
     return(
         <>
             <StatusBar barStyle={ themeState === 'dark' ? 'light-content' : 'dark-content' } backgroundColor={ colors.bgPrimary } />
-            <ScrollView style={{ minHeight: '100%', backgroundColor: colors.bgPrimary }} scrollEnabled={false} showsVerticalScrollIndicator={false}>
-
-                <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary }}>
-                    <View style={{ ...styles.headerContainer}}>
-                        <View style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', }}>
-                            <TouchableHighlight style={{ width: 30 }} onPress={() => navigation.goBack() } underlayColor={ colors.bgPrimary }>
-                                <Ionicons name={'ios-chevron-back'} size={ 30 } style={{ color: colors.textSecondary }} />
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ ...styles.keyboardAvoiding, backgroundColor: colors.bgPrimary }}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
+                    <View style={{ ...styles.mainContainer }}>
+                        <View style={{ ...styles.header }}>
+                            <View style={{ ...styles.topbar }}>
+                                <TouchableHighlight style={{ width: wp('37') }} onPress={() => navigation.goBack() } underlayColor={ colors.bgPrimary }>
+                                    <View style={{ ...styles.backbutton }}>
+                                        <Ionicons name={'ios-chevron-back'} size={ wp(8) } style={{ color: colors.blue }} />
+                                        <Text style={{ color: colors.blue, fontSize: 19 }}>Welcome Screen</Text>
+                                    </View>
+                                </TouchableHighlight>
+                            </View>
+                            <Text style={{ ...styles.heading, color: colors.blue }}>
+                                Create Account   
+                            </Text>
+                            <Text style={{ ...styles.subheading, color: colors.textSecondary }}>
+                                { subHeadingText }
+                            </Text>
+                        </View>
+                        <View style={{ ...styles.middle }}>
+                            <View style={{ ...styles.inputContainer }}>
+                                <View style={{ ...styles.textInputContainer, backgroundColor: colors.bgSecondary }}>
+                                    <Ionicons name={'ios-call'} size={ wp(6) } styl e={{ color: colors.textSecondary }}/>
+                                    <TextInput onChange={ handlePhonenumberInput } maxLength={10} keyboardType='phone-pad' textContentType='telephoneNumber' placeholderTextColor={ colors.textSecondary } style={{ ...styles.textinput }} placeholder='Phone Number'/>
+                                </View>
+                                <View style={{ ...styles.inputErrorContainer }}>
+                                    <Text style={{ color: 'red' }}>{ !otpError && errorMessage }</Text>
+                                </View>
+                                <View style={{ ...styles.textInputContainer, backgroundColor: colors.bgSecondary }}>
+                                    <Ionicons name={'ios-lock-open'} size={ wp(6) } style={{ color: colors.textSecondary }}/>
+                                    <TextInput onChange={e => {setCode(e.nativeEvent.text); if(otpError){ setErrorMessage("") }}} maxLength={6} keyboardType='phone-pad' textContentType='oneTimeCode' placeholder='Code' placeholderTextColor={ colors.textSecondary } style={{ ...styles.textinput }} />
+                                </View>
+                                <View style={{ ...styles.inputErrorContainer }}>
+                                    <Text style={{ color: 'red' }}>{ otpError && errorMessage }</Text>
+                                </View>
+                                <View style={{ ...styles.inputErrorContainer, marginTop: wp(5) }}>
+                                    <Text style={{ color: colors.blue, fontSize: 16 }}>Resend Code</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={{ ...styles.footer }}>
+                            <TouchableHighlight disabled={!inputVerified} style={{ ...styles.button, backgroundColor: inputVerified ? colors.blue : colors.disabledBlue}} underlayColor='#278eff' onPress={ () => verifyCode() }>
+                                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20}}>Create Account</Text>
                             </TouchableHighlight>
                         </View>
-                        <View style={{ padding: 8 }}>
-                            <Text style={{ color: colors.blue, fontWeight: 'bold', fontSize: 50, marginTop: 50 }}>Create Account</Text>
-                            <View>
-                                <Text style={{ fontSize: 24, color: colors.textSecondary, marginTop: 20, marginBottom: 20 }}>{ subHeadingText }</Text>
-                            </View>
-                            <View style={{ ...styles.inputContainer, backgroundColor: colors.bgSecondary }}>
-                                <Ionicons name={'ios-call'} size={ 24 } style={{ color: colors.textSecondary, marginRight: 12 }} />
-                                <TextInput onChange={ handlePhonenumberInput } maxLength={10} keyboardType='phone-pad' textContentType='telephoneNumber' placeholder='Phone number' style={{ ...styles.input, color: colors.textSecondary }} placeholderTextColor={ colors.textSecondary } />
-                            </View>
-                            <View style={{ ...styles.inputErrorContainer }}>
-                                <Text style={{ color: 'red' }}>{ !otpError && errorMessage }</Text>
-                            </View>
-                            <View style={{ ...styles.inputContainer, backgroundColor: colors.bgSecondary }}>
-                                <Ionicons name={'ios-lock-open'} size={ 24 } style={{ color: colors.textSecondary, marginRight: 12 }} />
-                                <TextInput onChange={e => {setCode(e.nativeEvent.text); if(otpError){ setErrorMessage("") }}} maxLength={6} keyboardType='phone-pad' textContentType='oneTimeCode' placeholder='Code' style={{ ...styles.input, color: colors.textSecondary }} placeholderTextColor={ colors.textSecondary } />
-                            </View>
-                            <View style={{ ...styles.inputErrorContainer }}>
-                                <Text style={{ color: 'red' }}>{ otpError && errorMessage }</Text>
-                            </View>
-                            <View style={{ ...styles.inputErrorContainer, marginTop: 20 }}>
-                                <Text style={{ color: colors.blue, fontSize: 16 }}>Resend Code</Text>
-                            </View>
-                        </View>
                     </View>
-                    <View style={{ ...styles.footerContainer }}>
-                        <TouchableHighlight disabled={!inputVerified} style={{ ...styles.buttonContainer, backgroundColor: inputVerified ? colors.blue : colors.disabledBlue}} underlayColor='#278eff' onPress={ () => verifyCode() }>
-                            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20}}>Create Account</Text>
-                        </TouchableHighlight>
-                    </View>
-                </View>
-            </ScrollView>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
             { showLoading && <LoadingScreen text={ loadingText } /> }
         </>
     )
@@ -151,52 +159,83 @@ export default function RegistrationScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+    keyboardAvoiding: {
+        padding: wp(6),
+        width: wp('100%'),
+        height: hp('100%'),
+    },
     mainContainer: {
-        width: '100%',
-        height: '100%',
+        flex: 1,
+    },
+    header: {
         display: 'flex',
         flexDirection: 'column',
-    },
-    headerContainer: {
-        height: '50%',
-        padding: 25
-    },
-    footerContainer: {
-        display: 'flex',
-        flexDirection: 'column-reverse',
+        justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        height: '50%',
-        paddingBottom: 40
     },
-    buttonContainer: {
+    topbar: {
+        width: wp('90%')
+    },
+    backbutton: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    heading: {
+        fontSize: 38,
+        marginVertical: wp(5),
+        fontWeight: 'bold',
+        width: wp('80%'),
+    },
+    subheading: {
+        fontSize: 18,
+        marginBottom: wp(6),
+        width: wp('80%'),
+    },
+    middle: {
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    inputContainer: {
+        width: wp('80%'),
+    },
+    textInputContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: wp(3),
+        marginVertical: wp(3),
+        paddingHorizontal: wp(3)
+    },
+    textinput: {
+        margin: 0,
+        fontSize: 18,
+        flexGrow: 1,
+        paddingVertical: wp(1.5),
+        paddingHorizontal: wp(2.5),
+        width: wp('70%')
+    },
+    footer: {
+        paddingVertical: wp(4),
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+    button: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '70%',
-        padding: 15,
-        borderRadius: 12,
-        marginTop: 300
-    },
-    inputContainer: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 15,
-        marginVertical: 7
-    }, 
-    input: {
-        padding: 7,
-        fontSize: 20,
-        flexGrow: 1
+        width: wp('80%'),
+        padding: wp(3),
+        borderRadius: wp(3),
     },
     inputErrorContainer: {
-        width: '100%',
+        width: wp('80%'),
         display: 'flex',
         flexDirection: 'row-reverse',
-        paddingHorizontal: 5
+        paddingHorizontal: wp(1)
     }
 })

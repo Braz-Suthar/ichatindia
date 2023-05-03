@@ -21,9 +21,9 @@ export default function NewPopupScreen({ chatIndividualyFunction, hideModal, cre
 
     return(
         <>
-            <TouchableHighlight onPress={ hideModal } style={{ ...styles.mainContainer, backgroundColor: colors.overlayBackgroundColor }}>
+            <TouchableHighlight onPress={ hideModal } underlayColor={ colors.bgPrimary } style={{ ...styles.mainContainer, backgroundColor: colors.overlayBackgroundColor }}>
                 <View style={{ ...styles.modalContainer, backgroundColor: colors.bgSecondary }}>
-                    <TouchableHighlight onPress={ chatIndividualyFunction } style={{ ...styles.button }}>
+                    <TouchableHighlight onPress={ chatIndividualyFunction } underlayColor={ colors.bgPrimary } style={{ ...styles.button }}>
                         <>
                             {/* <Image source={require("./../../Images/FlatIconLogo.png")} style={{ width: 24, height: 24, marginRight: 12 }}/> */}
                             <Ionicons name={'ios-person-add'} size={ 24 } style={{ color: colors.blue, marginRight: 12 }} />
@@ -31,7 +31,7 @@ export default function NewPopupScreen({ chatIndividualyFunction, hideModal, cre
                         </>
                     </TouchableHighlight>
                     <View style={{ ...styles.lineBreak, borderColor: colors.bgPrimary }}></View>
-                    <TouchableHighlight onPress={ createNewGroupFunction } style={{ ...styles.button }}>
+                    <TouchableHighlight onPress={ createNewGroupFunction } underlayColor={ colors.bgPrimary } style={{ ...styles.button }}>
                         <>
                             <MIcons name={'group-add'} size={ 30 } style={{ color: colors.blue, marginRight: 12 }} />
                             <Text style={{ ...styles.btnText, color: colors.textPrimary }}>Create New Group</Text>

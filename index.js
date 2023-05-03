@@ -10,7 +10,6 @@ import store from './src/StateManagement/Store/Store'
 
 messaging().setBackgroundMessageHandler(async message => {
     await firestore().collection("Demo").doc(message.data.savedName).set({text: message.data.text})
-    // console.log(message)
     const timeStamp = firestore.FieldValue.serverTimestamp()
     await firestore().collection('Chats').doc(message.data.chatID).collection('_').doc(message.data.textID).update({
         isReceived: true,
@@ -36,6 +35,7 @@ messaging().setBackgroundMessageHandler(async message => {
         },
     })
 });
+
 
 const ReduxProvider = () => {
     return(
