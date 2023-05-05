@@ -8,6 +8,7 @@ import ShowDPModal from './../Home/Components/ShowDP'
 import uuid from 'react-native-uuid'
 import { StackActions } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
+import { horizontalScale, horizontalScalePercent, moderateScale, verticalScalePercent } from '../../src/Metrics';
 
 
 const ContactItem = (props) => {
@@ -45,14 +46,14 @@ const ContactItem = (props) => {
                     <>
                         <TouchableHighlight underlayColor={'rgba(0,0,0,0)'} style={{ ...styles.details }} onPress={() => console.log("UsernameClicked")}>
                             <>
-                                <Text ellipsizeMode='tail' numberOfLines={1} style={{ fontSize: 24, color: colors.textPrimary}}>{ fullname }</Text>
-                                <Text ellipsizeMode='tail' numberOfLines={1} style={{ fontSize: 16, color: colors.textSecondary}}>{ about }</Text>
+                                <Text ellipsizeMode='tail' numberOfLines={1} style={{ fontSize: moderateScale(22), color: colors.textPrimary}}>{ fullname }</Text>
+                                <Text ellipsizeMode='tail' numberOfLines={1} style={{ fontSize: moderateScale(16), color: colors.textSecondary}}>{ about }</Text>
                             </>
                         </TouchableHighlight>
                     </>
                     <View>
                         <TouchableHighlight underlayColor={'rgba(0,0,0,0)'} disabled={createGroupReq && isSelected} onPress={iconClickHandler}>
-                            <Ionicons name={createGroupReq ? isSelected ? 'ios-checkmark-circle' : 'ios-add-circle-outline' : 'ios-chatbubble-ellipses-outline'} size={ 24 } style={{ color: colors.blue, fontWeight: 'bold', marginRight: 10 }} /> 
+                            <Ionicons name={createGroupReq ? isSelected ? 'ios-checkmark-circle' : 'ios-add-circle-outline' : 'ios-chatbubble-ellipses-outline'} size={ moderateScale(24) } style={{ color: colors.blue, fontWeight: 'bold', marginRight: moderateScale(10) }} /> 
                         </TouchableHighlight>
                     </View>
                 </>
@@ -70,16 +71,16 @@ const SelectedContactItemView = (props) => {
 
     return(
         <View style={{ ...styles.selectedContactItemViewContainer }}>
-            <TouchableHighlight underlayColor={'rgba(0,0,0,0)'} onPress={() => {removeSelected(contactID)}}style={{ width: '100%', textAlign: 'right', marginBottom: -10 }}>
-                <Ionicons name={'ios-close-circle'} size={ 24 } style={{ color: colors.blue, fontWeight: 'bold', width: '100%', textAlign: 'right',}} />
+            <TouchableHighlight underlayColor={'rgba(0,0,0,0)'} onPress={() => {removeSelected(contactID)}}style={{ width: horizontalScalePercent(17), textAlign: 'right', marginBottom: moderateScale(-11.5) }}>
+                <Ionicons name={'ios-close-circle'} size={ moderateScale(22) } style={{ color: colors.blue, fontWeight: 'bold', width: horizontalScalePercent(20), textAlign: 'right',}} />
             </TouchableHighlight>
             <View style={{ ...styles.selectedContactItemViewOuter, borderColor: colors.blue, backgroundColor: colors.bgPrimary }}>
                 <View style={{ ...styles.selectedContactItemView }}>
                     <Image style={{ ...styles.selectedContactItemView }} source={{uri: 'https://firebasestorage.googleapis.com/v0/b/ichatindia.appspot.com/o/FlatIcons%2F45.png?alt=media&token=775e27ce-8dca-4a2c-98c0-01cb0315d03f'}}/>
                 </View>
             </View>
-            <View style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-                <Text style={{ ...styles.selectedContactName }} numberOfLines={1} ellipsizeMode={'tail'} >Braz Suthar</Text>
+            <View style={{ width: horizontalScalePercent(23), display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+                <Text allowFontScaling={false} style={{ ...styles.selectedContactName }} numberOfLines={1} ellipsizeMode={'tail'} >Braz Suthar</Text>
             </View>
         </View>
     )
@@ -185,13 +186,13 @@ export default function ContactScreen({ route, navigation }) {
             <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary}}>
                 <View style={{ ...styles.header }}>
                     <TouchableHighlight onPress={() => navigation.goBack()} underlayColor={ colors.bgPrimary }>
-                        <Ionicons name={'ios-chevron-back'} size={ 32 } style={{ color: colors.blue, fontWeight: 'bold', marginRight: 10 }} />
+                        <Ionicons name={'ios-chevron-back'} size={ moderateScale(32) } style={{ color: colors.blue, fontWeight: 'bold', marginRight: moderateScale(10) }} />
                     </TouchableHighlight>
                     <Text style={{ ...styles.headerText, color: colors.textPrimary }}>{ createGroupReq ? 'Create New Group' : 'Chat Individualy'}</Text>
                 </View>
-                <View style={{ display: 'flex', flexDirection: 'row', backgroundColor: colors.bgSecondary, width: '100%', paddingTop: 5, paddingBottom: 5, borderRadius: 10, marginBottom: 5 }}>
+                <View style={{ display: 'flex', flexDirection: 'row', backgroundColor: colors.bgSecondary, width: horizontalScalePercent(93), paddingTop: moderateScale(5), paddingBottom: moderateScale(5), borderRadius: moderateScale(10), marginBottom: moderateScale(5) }}>
                     <View style={{ ...styles.leftContainer }}>
-                        <Ionicons name={'ios-search-outline'} size={ 18 } style={{ color: colors.textSecondary }} />
+                        <Ionicons name={'ios-search-outline'} size={ moderateScale(18) } style={{ color: colors.textSecondary }} />
                     </View>
                     <View style={{ ...styles.rightContainer }}>
                         <TextInput 
@@ -206,7 +207,7 @@ export default function ContactScreen({ route, navigation }) {
                 {
                     selectedContact && 
                     <View style={{ ...styles.selectedContactListContainer}}>
-                        <ScrollView showsHorizontalScrollIndicator={false} contentInset={20} contentInsetAdjustmentBehavior={'scrollableAxes'} horizontal={true} alwaysBounceHorizontal={true}>
+                        <ScrollView showsHorizontalScrollIndicator={false} contentInset={moderateScale(20)} contentInsetAdjustmentBehavior={'scrollableAxes'} horizontal={true} alwaysBounceHorizontal={true}>
                             {
                                 selectedContact && selectedContact.map((selectedContactItem, index) => {
                                     return <>
@@ -217,20 +218,20 @@ export default function ContactScreen({ route, navigation }) {
                         </ScrollView>
                     </View>
                 }
-                <ScrollView style={{ marginTop: 12 }}>
+                <ScrollView style={{ marginTop: moderateScale(12) }}>
                     { ichatUserContactList && ichatUserContactList.map((contact) => {
                         return <>
                             <ContactItem startIndividualChat={startIndividualChat} onSelectIconClick={ selectContactForGroup } conatctID={contact.uuid} key={contact.uuid} createGroupReq={createGroupReq} isSelected={selectedContact && selectedContact.includes(contact.uuid)} dpOnClick={ setShowDPURLFunction } fullname={contact.fullname} about={contact.about} phonenumber={contact.phonenumber} colors={colors} profilePicture={contact.profilePicture}/>
                         </>
                     }) }
-                    { showCreateGroupButton &&  <View style={{ paddingVertical: 50 }}></View>}
+                    { showCreateGroupButton &&  <View style={{ paddingVertical: moderateScale(50) }}></View>}
                 </ScrollView>
                 {
                     showCreateGroupButton &&
                     <TouchableHighlight onPress={ createNewGroupFunction } style={{ ...styles.button, backgroundColor: colors.bgSecondary }}>
                         <>
-                            <MIcons name={'group-add'} size={ 30 } style={{ color: colors.blue, marginRight: 12 }} />
-                            <Text style={{ ...styles.btnText, color: colors.textPrimary }}>Create New Group</Text>
+                            <MIcons name={'group-add'} size={ moderateScale(30) } style={{ color: colors.blue, marginRight: moderateScale(12) }} />
+                            <Text allowFontScaling={false} style={{ ...styles.btnText, color: colors.textPrimary }}>Create New Group</Text>
                         </>
                     </TouchableHighlight>
                 }
@@ -243,99 +244,99 @@ export default function ContactScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: "100%",
-        height: "100%",
-        padding: 12
+        width: horizontalScalePercent(100),
+        height: verticalScalePercent(100),
+        padding: moderateScale(12)
     },
     header:{
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 13
+        marginBottom: moderateScale(13),
     },
     headerText: {
-        fontSize: 32,
+        fontSize: moderateScale(30),
         flexGrow: 1
     },
     contactItem: {
-        width: "100%",
-        paddingVertical: 8,
-        paddingHorizontal: 8,
+        width: horizontalScalePercent(93),
+        paddingVertical: moderateScale(8),
+        paddingHorizontal: moderateScale(8),
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        borderRadius: 10,
-        marginTop: 3
+        borderRadius: moderateScale(10),
+        marginTop: moderateScale(3)
     },
     profilePicture: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: horizontalScale(44),
+        height: horizontalScale(44),
+        borderRadius: horizontalScale(22),
     },
     details: {
         display: "flex",
         flexDirection: "column",
-        marginLeft: 18,
-        width: "75%",
-        paddingRight: 15
+        marginLeft: moderateScale(18),
+        width: horizontalScalePercent(65),
+        paddingRight: moderateScale(15)
     },
     button: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        padding: 15,
-        borderRadius: 15
+        width: horizontalScalePercent(90),
+        padding: moderateScale(15),
+        borderRadius: moderateScale(15)
     },
     btnText: {
-        fontSize: 20
+        fontSize: moderateScale(20)
     },
     leftContainer: {
-        width: '15%',
+        width: horizontalScalePercent(15),
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
     },
     rightContainer: {
-        width: '80%',
+        width: horizontalScalePercent(73),
     },
     textInput: {
         padding: 0,
-        fontSize: 18,
-        width: '100%',
+        fontSize: moderateScale(18),
+        width: horizontalScalePercent(73),
     },
     selectedContactListContainer: {
-        width: '100%',
-        marginBottom: 13,
-        paddingTop: 12
+        width: horizontalScalePercent(100),
+        marginBottom: moderateScale(13),
+        paddingTop: moderateScale(12),
     },
     selectedContactItemViewContainer: {
-        width: 80,
-        height: 80,
-        marginRight: 10,
+        width: horizontalScale(80),
+        height: horizontalScale(80),
+        marginRight: moderateScale(10),
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
         alignItems: 'center',
     },
     selectedContactItemViewOuter: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: horizontalScale(42),
+        height: horizontalScale(42),
+        borderRadius: horizontalScale(21),
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center'
     },
     selectedContactItemView: {
-        width: '100%',
-        height: '100%',
+        width: horizontalScalePercent(13),
+        height: horizontalScalePercent(13),
         backgroundColor: 'white',
-        borderRadius: 50,
+        borderRadius: horizontalScalePercent(6.5),
     },
     selectedContactName: {
-        marginTop: 5,
+        marginTop: moderateScale(5),
     }
 })

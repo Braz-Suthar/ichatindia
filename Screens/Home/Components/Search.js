@@ -10,7 +10,7 @@ export default function Search(props) {
         <View style={{ ...styles.mainContainer }}>
             <View style={{ display: 'flex', flexDirection: 'row', backgroundColor: colors.bgSecondary, width: horizontalScalePercent(95.5), paddingTop: verticalScale(2), paddingBottom: verticalScale(2), borderRadius: moderateScale(6) }}>
                 <View style={{ ...styles.leftContainer }}>
-                    <Ionicons name={'ios-search-outline'} size={ moderateScale(17) } style={{ color: colors.textSecondary }} />
+                    <Ionicons name={'ios-search-outline'} size={ moderateScale(19) } style={{ color: colors.textSecondary }} />
                 </View>
                 <View style={{ ...styles.rightContainer }}>
                     <TextInput 
@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
         width: horizontalScalePercent(80),
     },
     textInput: {
-        padding: 0,
-        fontSize: moderateScale(15),
+        paddingVertical: moderateScale(5),
+        fontSize: moderateScale(17),
         width: horizontalScalePercent(76),
     }
 })

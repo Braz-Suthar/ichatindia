@@ -25,7 +25,7 @@ const ChatItem = (props) => {
                 </View>
                 
                 <View style={{ ...styles.chatItemMiddle }}>
-                    <Username username={ props.chatItem.savedName || props.chatItem.phonenumber } colors={ colors } customStyle={{ fontSize: moderateScale(15), marginTop: -3 }}/>
+                    <Username username={ props.chatItem.savedName || props.chatItem.phonenumber } colors={ colors } customStyle={{ fontSize: moderateScale(17), marginTop: -3 }}/>
                     <View style={{ ...styles.chatItemTextView }}>
                         { chatItem.sender == props.currentUserPhonenumber && (chatItem.isReceived ? chatItem.isRead  ? <Ionicons name={'ios-checkmark-done'} size={ moderateScale(11.5) } style={{ color: colors.blue }}/> : <Ionicons name={'ios-checkmark-done'} size={ moderateScale(11.5) } style={{ color: colors.textSecondary }}/> : <Ionicons name={'ios-checkmark'} size={ moderateScale(11.5) } style={{ color: colors.textSecondary }}/>)}
                         <Text allowFontScaling={false} style={{ ...styles.textMessage, color: colors.textSecondary }} ellipsizeMode={'tail'} numberOfLines={1}>{ props.chatItem.lastMessage }</Text>
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     chatItem: {
-        width: horizontalScalePercent(93),
+        width: horizontalScalePercent(94),
         borderRadius: 12,
         padding: moderateScale(8),
         display: 'flex',
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
         padding: moderateScale(10)
     },
     textMessage: {
-        fontSize: moderateScale(10),
+        fontSize: moderateScale(12),
         marginLeft: moderateScale(3)
     },
     chatItemLeft: {
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         width: horizontalScalePercent(56),
-        marginTop: verticalScale(1.5),
+        marginTop: moderateScale(3),
         alignItems: 'center',
     },
     newMessagesBadge: {

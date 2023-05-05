@@ -4,6 +4,7 @@ import { Text, View, StyleSheet, Appearance, Image, TouchableHighlight, StatusBa
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../../Colors'
 import MIcons from 'react-native-vector-icons/MaterialIcons'
+import { horizontalScalePercent, moderateScale, verticalScalePercent } from '../../src/Metrics';
 
 
 export default function NewPopupScreen({ chatIndividualyFunction, hideModal, createNewGroupFunction }) {
@@ -26,15 +27,15 @@ export default function NewPopupScreen({ chatIndividualyFunction, hideModal, cre
                     <TouchableHighlight onPress={ chatIndividualyFunction } underlayColor={ colors.bgPrimary } style={{ ...styles.button }}>
                         <>
                             {/* <Image source={require("./../../Images/FlatIconLogo.png")} style={{ width: 24, height: 24, marginRight: 12 }}/> */}
-                            <Ionicons name={'ios-person-add'} size={ 24 } style={{ color: colors.blue, marginRight: 12 }} />
-                            <Text style={{ ...styles.btnText, color: colors.textPrimary }}>Chat Individualy</Text>
+                            <Ionicons name={'ios-person-add'} size={ moderateScale(24) } style={{ color: colors.blue, marginRight: moderateScale(12) }} />
+                            <Text allowFontScaling={false} style={{ ...styles.btnText, color: colors.textPrimary }}>Chat Individualy</Text>
                         </>
                     </TouchableHighlight>
                     <View style={{ ...styles.lineBreak, borderColor: colors.bgPrimary }}></View>
                     <TouchableHighlight onPress={ createNewGroupFunction } underlayColor={ colors.bgPrimary } style={{ ...styles.button }}>
                         <>
-                            <MIcons name={'group-add'} size={ 30 } style={{ color: colors.blue, marginRight: 12 }} />
-                            <Text style={{ ...styles.btnText, color: colors.textPrimary }}>Create New Group</Text>
+                            <MIcons name={'group-add'} size={ moderateScale(30) } style={{ color: colors.blue, marginRight: moderateScale(12) }} />
+                            <Text allowFontScaling={false} style={{ ...styles.btnText, color: colors.textPrimary }}>Create New Group</Text>
                         </>
                     </TouchableHighlight>
                 </View>
@@ -45,8 +46,8 @@ export default function NewPopupScreen({ chatIndividualyFunction, hideModal, cre
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: '100%',
-        height: '100%',
+        width: horizontalScalePercent(100),
+        height: verticalScalePercent(100),
         display: 'flex',
         flexDirection: 'column-reverse',
         alignItems: 'center',
@@ -54,27 +55,27 @@ const styles = StyleSheet.create({
         zIndex: 99999999,
     },
     modalContainer: {
-        width: '95%',
+        width: horizontalScalePercent(95),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        borderRadius: 15,
-        marginBottom: 15
+        borderRadius: moderateScale(15),
+        marginBottom: moderateScale(15)
     },
     button: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        padding: 15,
+        width: horizontalScalePercent(100),
+        padding: moderateScale(15),
     },
     btnText: {
-        fontSize: 20
+        fontSize: moderateScale(20)
     },
     lineBreak: {
-        width: '100%',
-        borderWidth: 2,
+        width: horizontalScalePercent(100),
+        borderWidth: moderateScale(2),
         borderStyle: 'solid',
     }
 })

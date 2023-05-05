@@ -1,6 +1,7 @@
 import React from 'react'
 import { Text, View, StyleSheet } from "react-native"
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { horizontalScalePercent, moderateScale } from '../../../src/Metrics'
 
 export default function Message(props) {
 
@@ -25,8 +26,8 @@ export default function Message(props) {
                 <View style={styles.messageSentFooter}>
                     <Text allowFontScaling={false} style={{...styles.messageTime, color: colors.textSecondary }}>{ `${ messageData.sentAt && messageData.sentAt.toDate().toString().split(' ')[4].toString().substring(0,5) }` }</Text>
                     { !props.received && !messageData.isRecieved ? 
-                        ( messageData.isRead ? <Ionicons name={'ios-checkmark-done'} size={ 13 } style={{ color: '#146C94', padding: 3 }} /> : <Ionicons name={'ios-checkmark-done'} size={ 13 } style={{ color: colors.textSecondary, padding: 3 }} />)
-                        : <Ionicons name={'ios-checkmark'} size={ 13 } style={{ color: colors.textSecondary, padding: 3 }} />
+                        ( messageData.isRead ? <Ionicons name={'ios-checkmark-done'} size={ moderateScale(14) } style={{ color: '#146C94', padding: moderateScale(3) }} /> : <Ionicons name={'ios-checkmark-done'} size={ moderateScale(14) } style={{ color: colors.textSecondary, padding: moderateScale(3) }} />)
+                        : <Ionicons name={'ios-checkmark'} size={ moderateScale(14) } style={{ color: colors.textSecondary, padding: moderateScale(3) }} />
                     }
                 </View>
             </> }
@@ -47,27 +48,27 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
     },
     messageReceivedOuter: {
-        maxWidth: '80%',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderBottomRightRadius: 10,
-        borderTopRightRadius: 10,
-        borderTopLeftRadius: 10,
+        maxWidth: horizontalScalePercent(80),
+        paddingVertical: moderateScale(5),
+        paddingHorizontal: moderateScale(10),
+        borderBottomRightRadius: moderateScale(10),
+        borderTopRightRadius: moderateScale(10),
+        borderTopLeftRadius: moderateScale(15),
     },
     messageSentOuter: {
-        maxWidth: '80%',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderBottomLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderTopLeftRadius: 10,
+        maxWidth: horizontalScalePercent(80),
+        paddingVertical: moderateScale(5),
+        paddingHorizontal: moderateScale(10),
+        borderBottomLeftRadius: moderateScale(10),
+        borderTopRightRadius: moderateScale(15),
+        borderTopLeftRadius: moderateScale(10),
     },
     messageText: {
-        fontSize: 19,
+        fontSize: moderateScale(15),
     },
     messageTime: {
-        fontSize: 12,
-        marginTop: 2
+        fontSize: moderateScale(10),
+        marginTop: moderateScale(3)
     },
     messageSentFooter: {
         display: 'flex',

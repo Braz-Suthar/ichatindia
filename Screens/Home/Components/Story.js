@@ -49,8 +49,8 @@ export default function Story(props) {
 const styles = StyleSheet.create({
     mainContainer: {
         width: horizontalScalePercent(100),
-        paddingTop: verticalScale(10),
-        paddingBottom: verticalScale(0),
+        paddingTop: moderateScale(15),
+        paddingBottom: moderateScale(12),
     },
     header: {
         display: 'flex',

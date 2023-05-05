@@ -11,6 +11,8 @@ import firestore from '@react-native-firebase/firestore'
 import uuid from 'react-native-uuid'
 import sendNotification from './sendNotification.js';
 import { useSelector } from 'react-redux';
+import { horizontalScalePercent, verticalScalePercent, horizontalScale, verticalScale, moderateScale } from './../../src/Metrics'
+
 
 export default function ChatScreen({ route, navigation }) {
 
@@ -179,33 +181,33 @@ export default function ChatScreen({ route, navigation }) {
         <View style={{ ...styles.mainContainer, backgroundColor: colors.bgPrimary }}>
             <View style={{ ...styles.header }}>
                 <TouchableHighlight onPress={() => navigation.goBack() } underlayColor={ colors.bgPrimary } style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <Ionicons name={'ios-chevron-back'} size={ 34 } style={{ color: colors.textSecondary, marginLeft: -8 }} />
+                  <Ionicons name={'ios-chevron-back'} size={ moderateScale(30) } style={{ color: colors.textSecondary, marginLeft: moderateScale(-8) }} />
                 </TouchableHighlight>
                 <View style={{ ...styles.headerLeft}}>
-                    <Username username={ userData && (userData.savedName ? userData.savedName : userData.fullname) } customStyle={{ fontSize: 34 }} colors={ colors } />
+                    <Username username={ userData && (userData.savedName ? userData.savedName : userData.fullname) } customStyle={{ fontSize: moderateScale(22) }} colors={ colors } />
                     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
-                      <Icon name={'dot-fill'} size={ 18 } style={{ color: 'green', marginRight: 5 }} />
-                      <About about={ userData && userData.about } customStyle={{ fontSize: 15 }} colors={ colors } />
+                      <Icon name={'dot-fill'} size={ moderateScale(18) } style={{ color: 'green', marginRight: moderateScale(5) }} />
+                      <About about={ userData && userData.about } customStyle={{ fontSize: moderateScale(12) }} colors={ colors } />
                     </View>
                 </View>
                 <View style={{ ...styles.dpOuter, backgroundColor: colors.bgPrimary }}>
-                    <ProfilePicture dpURL={ userData && userData.profilePicture } dpOnClick={(url) => { console.log(url) }} customStyle={{ width: 50, height: 50 }}/>
+                    <ProfilePicture dpURL={ userData && userData.profilePicture } dpOnClick={(url) => { console.log(url) }} customStyle={{ width: horizontalScale(43), height: horizontalScale(43) }}/>
                 </View>
             </View>
-            <ScrollView keyboardDismissMode={'on-drag'} showsVerticalScrollIndicator={false} paddingVertical={20} style={{ ...styles.textScrollView, transform: [{ scaleY: -1 }]}}>
+            <ScrollView keyboardDismissMode={'on-drag'} showsVerticalScrollIndicator={false} paddingVertical={moderateScale(20)} style={{ ...styles.textScrollView, transform: [{ scaleY: -1 }]}}>
                 {
                   messageData && Object.keys(messageData).map((key) => {
                     return <Message key={key} colors={ colors } received={messageData[key].receiver == currentUser.phonenumber } message={messageData[key]}/>
                   })
                 }
-                <View style={{ padding: 20 }}></View>
+                <View style={{ padding: moderateScale(20) }}></View>
             </ScrollView>
             <View style={{ ...styles.footer}}>
-              <Ionicons name={'ios-attach'} size={ 24 } style={{ color: colors.textSecondary, padding: 6 }} />
-              <Ionicons name={'ios-happy-outline'} size={ 24 } style={{ color: colors.textSecondary, padding: 6 }} />
+              <Ionicons name={'ios-attach'} size={ moderateScale(24) } style={{ color: colors.textSecondary, padding: moderateScale(6) }} />
+              <Ionicons name={'ios-happy-outline'} size={ moderateScale(24) } style={{ color: colors.textSecondary, padding: moderateScale(6) }} />
               <TextInput multiline={ true } onContentSizeChange={(event) => {setHeight(event.nativeEvent.contentSize.height)}} ref={input => { setInputRef(input) }} onChangeText={(text_) => { setText(text_) }} style={{ ...styles.textInput, backgroundColor: colors.bgSecondary, color: colors.textPrimary, maxHeight: 80 }} placeholderTextColor={ colors.textPrimary } placeholder='type your message here'/>
               <TouchableHighlight onPress={sendMessage}>
-                <Ionicons name={'ios-paper-plane-outline'} size={ 24 } style={{ color: colors.textSecondary, padding: 6 }} />
+                <Ionicons name={'ios-paper-plane-outline'} size={ moderateScale(24) } style={{ color: colors.textSecondary, padding: moderateScale(6) }} />
               </TouchableHighlight>
             </View>
         </View>
@@ -216,29 +218,30 @@ export default function ChatScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    width: '100%',
+    width: horizontalScalePercent(100),
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    padding: 15
+    padding: moderateScale(15)
   },
   header: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12
+    alignItems: 'center',
+    marginBottom: moderateScale(12),
   },
   headerLeft: {
-    width: '70%',
+    width: horizontalScalePercent(70),
   },
   dpOuter: {
-    width: 52,
-    height: 52,
+    width: horizontalScale(46),
+    height: horizontalScale(46),
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 26,
+    borderRadius: horizontalScale(23),
   },
   footer: {
     display: 'flex',
@@ -247,11 +250,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   textInput: {
-    width: '65%',
-    paddingHorizontal: 10,
-    marginHorizontal: 15,
-    paddingVertical: 3,
-    borderRadius: 10,
-    fontSize: 20,
+    width: horizontalScalePercent(65),
+    paddingHorizontal: moderateScale(10),
+    marginHorizontal: moderateScale(15),
+    paddingVertical: moderateScale(4),
+    borderRadius: moderateScale(10),
+    fontSize: moderateScale(20),
   }
 })
